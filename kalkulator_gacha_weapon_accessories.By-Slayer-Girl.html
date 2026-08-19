@@ -1,0 +1,2746 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#171923">
+  <title>Kalkulator Gacha Weapon dan Accessories</title>
+  <style>
+* { box-sizing: border-box; }
+:root {
+  --bg: #0f1117;
+  --card: #171a23;
+  --card2: #1d212c;
+  --line: #303645;
+  --text: #f4f6fb;
+  --muted: #9ca5b7;
+  --accent: #ffb51b;
+  --accent2: #ffd76a;
+  --danger: #ff647c;
+  --good: #62d99a;
+}
+body {
+  margin: 0;
+  background: radial-gradient(circle at top, #252a38 0, var(--bg) 42%);
+  color: var(--text);
+  font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+.container { width: min(100% - 28px, 980px); margin: 0 auto; padding: 28px 0 40px; }
+.hero { display:flex; justify-content:space-between; gap:20px; align-items:flex-start; margin-bottom:20px; }
+.eyebrow { color:var(--accent); font-size:12px; font-weight:800; letter-spacing:1.8px; margin-bottom:8px; }
+.byline { color:var(--accent); font-size:14px; font-weight:700; margin: -2px 0 8px; }
+h1 { margin:0 0 8px; font-size:clamp(28px,5vw,44px); line-height:1.05; }
+h2 { margin:0 0 6px; font-size:20px; }
+h3 { margin:0 0 12px; font-size:16px; }
+p { color:var(--muted); margin:0; line-height:1.5; }
+.card {
+  background:linear-gradient(145deg, rgba(29,33,44,.98), rgba(20,23,31,.98));
+  border:1px solid var(--line); border-radius:18px; padding:20px; margin-bottom:16px;
+  box-shadow:0 10px 30px rgba(0,0,0,.18);
+}
+.grid.two { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+label { display:flex; flex-direction:column; gap:8px; color:#d8deea; font-size:13px; font-weight:700; }
+input, textarea {
+  width:100%; border:1px solid #394152; background:#10131a; color:var(--text);
+  border-radius:10px; padding:12px; outline:none; font:inherit;
+}
+input:focus, textarea:focus { border-color:var(--accent); box-shadow:0 0 0 3px rgba(255,181,27,.12); }
+.shortage {
+  margin-top:15px; padding:15px; border-radius:12px; background:#11151d; border:1px solid #2d3442;
+  display:flex; justify-content:space-between; align-items:center;
+}
+.shortage span { color:var(--muted); }
+.shortage strong { color:var(--accent); font-size:24px; }
+.section-head { display:flex; justify-content:space-between; gap:16px; align-items:center; margin-bottom:16px; }
+.primary-btn, .ghost-btn, .delete-btn {
+  border:0; border-radius:10px; padding:10px 14px; cursor:pointer; font-weight:800;
+}
+.primary-btn { background:var(--accent); color:#17130a; }
+.primary-btn:hover { background:var(--accent2); }
+.ghost-btn { background:#242a36; color:var(--text); border:1px solid var(--line); }
+.ghost-btn:hover { background:#2c3341; }
+.table-wrap { overflow-x:auto; }
+table { width:100%; border-collapse:collapse; min-width:620px; }
+th { text-align:left; color:var(--muted); font-size:12px; padding:10px; border-bottom:1px solid var(--line); }
+td { padding:9px 10px; border-bottom:1px solid #272d39; }
+td input { padding:9px 10px; }
+.delete-btn { background:transparent; color:var(--danger); font-size:18px; padding:8px 10px; }
+.hint { margin-top:14px; padding:12px 14px; background:#11151d; border-radius:10px; color:var(--muted); font-size:13px; line-height:1.5; }
+.status { font-size:12px; padding:6px 9px; border-radius:999px; background:#173124; color:var(--good); font-weight:800; }
+.status.error { background:#351923; color:#ff91a1; }
+.result-grid { display:grid; grid-template-columns:1.5fr 1fr 1fr 1fr; gap:10px; }
+.result-box { background:#11151d; border:1px solid #2b3240; border-radius:13px; padding:14px; }
+.result-box span { display:block; color:var(--muted); font-size:12px; margin-bottom:7px; }
+.result-box strong { font-size:22px; }
+.result-box small { color:var(--muted); }
+.main-result { border-color:rgba(255,181,27,.45); }
+.main-result strong { color:var(--accent); font-size:30px; }
+.breakdown { margin-top:20px; }
+.breakdown-list { display:flex; flex-direction:column; gap:8px; }
+.breakdown-row { display:grid; grid-template-columns:1fr auto auto; gap:14px; align-items:center; background:#11151d; padding:11px 13px; border-radius:10px; }
+.breakdown-row .name { font-weight:800; }
+.breakdown-row .qty { color:var(--muted); }
+.breakdown-row .cost { font-weight:800; }
+.empty { color:var(--muted); padding:10px 0; }
+.saved-note { margin-top:8px; font-size:12px; }
+footer { color:#697285; display:flex; justify-content:space-between; gap:10px; font-size:12px; padding:8px 2px; }
+@media (max-width:700px) {
+  .container { width:min(100% - 18px, 980px); padding-top:18px; }
+  .hero, .section-head { flex-direction:column; align-items:stretch; }
+  .ghost-btn, .primary-btn { width:100%; }
+  .grid.two, .result-grid { grid-template-columns:1fr 1fr; }
+  .main-result { grid-column:1 / -1; }
+  footer { flex-direction:column; }
+}
+@media (max-width:430px) {
+  .grid.two, .result-grid { grid-template-columns:1fr; }
+  .main-result { grid-column:auto; }
+  .shortage strong { font-size:20px; }
+}
+
+</style>
+
+<style>
+header{text-align:center!important}
+header h1{
+  color:#ffd33d!important;
+  text-align:center!important;
+  text-shadow:0 0 8px rgba(255,195,30,.45),0 0 18px rgba(255,170,0,.18);
+  line-height:1.05!important;
+  margin:0 auto!important;
+}
+header h1 span{display:block}
+.byline{
+  width:100%!important;
+  display:flex!important;
+  justify-content:center!important;
+  align-items:center!important;
+  gap:14px!important;
+  color:#fff!important;
+  text-align:center!important;
+  margin:12px auto 18px!important;
+}
+.item-icon{
+  width:58px!important;height:58px!important;
+  object-fit:cover!important;
+  border-radius:9px!important;
+  border:1px solid #b98518!important;
+  box-shadow:0 0 12px rgba(255,194,30,.28)!important;
+}
+.byline span{font-size:18px;font-weight:800;color:#fff}
+@media(max-width:560px){
+  header h1{font-size:30px!important}
+  .item-icon{width:48px!important;height:48px!important}
+  .byline{gap:10px!important}
+  .byline span{font-size:16px}
+}
+</style>
+<style>
+#target{
+  width:100%;
+  background:#080c12;
+  border:1px solid #3a4354;
+  color:#fff;
+  border-radius:10px;
+  padding:12px;
+  font-size:16px;
+  outline:none;
+  cursor:pointer;
+}
+#target:focus{border-color:#ffc51b;box-shadow:0 0 0 3px rgba(255,197,27,.1)}
+</style>
+<style>
+#current{
+  font-variant-numeric: tabular-nums;
+}
+</style>
+<style>
+#target{line-height:1.35}
+@media(max-width:560px){
+  #target{font-size:14px;padding:11px 10px}
+}
+</style><style>
+.selected-pity-reward{
+  margin-top:7px;
+  color:#ffc51b;
+  font-size:12px;
+  font-weight:800;
+  line-height:1.35;
+}
+</style>
+<style>
+/* ===== Premium visual polish v12 ===== */
+body{
+  background:
+    radial-gradient(circle at 50% -8%, rgba(255,195,55,.16), transparent 34%),
+    radial-gradient(circle at 0% 45%, rgba(92,66,255,.08), transparent 28%),
+    #070a10;
+}
+body:before{
+  content:"";
+  position:fixed;inset:0;pointer-events:none;opacity:.18;
+  background-image:linear-gradient(rgba(255,255,255,.025) 1px,transparent 1px),
+                   linear-gradient(90deg,rgba(255,255,255,.025) 1px,transparent 1px);
+  background-size:28px 28px;
+}
+.container{padding-top:26px;position:relative}
+header{padding:8px 8px 20px}
+header h1{
+  letter-spacing:-.7px;
+  text-shadow:0 0 12px rgba(255,200,40,.34),0 2px 18px rgba(0,0,0,.8);
+}
+.byline{
+  opacity:.95;
+  text-shadow:0 1px 8px rgba(0,0,0,.8);
+}
+.info{
+  border-color:rgba(67,159,255,.35);
+  background:linear-gradient(135deg,rgba(18,47,74,.72),rgba(10,19,31,.92));
+  box-shadow:inset 0 1px rgba(255,255,255,.04),0 8px 24px rgba(0,0,0,.18);
+}
+.card{
+  position:relative;
+  overflow:hidden;
+  border-color:rgba(93,106,130,.38);
+  background:linear-gradient(145deg,rgba(19,24,34,.96),rgba(10,14,21,.98));
+  box-shadow:0 14px 35px rgba(0,0,0,.25),inset 0 1px rgba(255,255,255,.035);
+}
+.card:before{
+  content:"";position:absolute;left:0;top:0;width:100%;height:2px;
+  background:linear-gradient(90deg,transparent,rgba(255,196,32,.65),transparent);
+  opacity:.7;
+}
+.section-title{letter-spacing:.4px}
+#current,#target{
+  border-color:#3b4658;
+  background:linear-gradient(180deg,#0b1017,#070a0f);
+  box-shadow:inset 0 1px rgba(255,255,255,.025);
+  transition:.18s;
+}
+#current:hover,#target:hover{border-color:#68758b}
+#current:focus,#target:focus{border-color:#ffc51b!important}
+.shortage{
+  background:radial-gradient(circle at 50% 0,rgba(255,196,27,.12),transparent 65%),#090c12;
+  border-color:rgba(255,196,27,.48);
+  box-shadow:0 0 20px rgba(255,196,27,.06);
+}
+.shortage strong{text-shadow:0 0 10px rgba(255,210,60,.25)}
+.tip{
+  background:rgba(14,18,26,.72);
+  border-color:rgba(118,92,169,.42);
+}
+.mode-option{
+  transition:transform .16s, border-color .16s, background .16s, box-shadow .16s;
+}
+.mode-option:hover{transform:translateY(-1px);border-color:#56657a}
+.mode-option.selected{
+  background:linear-gradient(100deg,rgba(24,55,82,.72),rgba(10,18,27,.95));
+  box-shadow:0 0 0 1px rgba(54,167,255,.18),0 8px 22px rgba(0,0,0,.18);
+}
+.mode-option strong{color:#f6f8fb}
+.result-card{
+  border-color:rgba(83,191,105,.28);
+}
+.box{
+  background:linear-gradient(145deg,rgba(10,25,15,.78),rgba(8,13,12,.96));
+  box-shadow:inset 0 1px rgba(255,255,255,.025);
+}
+.main{
+  background:linear-gradient(145deg,rgba(12,25,40,.9),rgba(7,12,18,.98));
+  border-color:rgba(54,167,255,.25);
+}
+.main strong{
+  text-shadow:0 0 12px rgba(54,167,255,.22);
+}
+.badge{
+  box-shadow:0 0 12px rgba(88,223,101,.08);
+}
+.breakdown-row{
+  background:linear-gradient(90deg,#0a0f15,#0c121a);
+  border:1px solid rgba(57,68,84,.42);
+  transition:.16s;
+}
+.breakdown-row:hover{border-color:#526075}
+.actions button{
+  transition:transform .15s,filter .15s;
+}
+.actions button:hover{transform:translateY(-1px);filter:brightness(1.08)}
+.calc{box-shadow:0 7px 18px rgba(255,197,27,.12)}
+footer{
+  background:rgba(9,12,17,.62);
+  border-color:rgba(65,75,91,.35);
+}
+</style>
+</head>
+<body>
+<!-- V26-CLEAN-LAYOUT -->
+  <main class="container">
+    <header class="hero">
+      <div>
+        <h1><span>Kalkulator Gacha</span><span>Weapon dan Accessories</span></h1>
+        <div class="byline"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEwAAABMCAYAAADHl1ErAAABCGlDQ1BJQ0MgUHJvZmlsZQAAeJxjYGA8wQAELAYMDLl5JUVB7k4KEZFRCuwPGBiBEAwSk4sLGHADoKpv1yBqL+viUYcLcKakFicD6Q9ArFIEtBxopAiQLZIOYWuA2EkQtg2IXV5SUAJkB4DYRSFBzkB2CpCtkY7ETkJiJxcUgdT3ANk2uTmlyQh3M/Ck5oUGA2kOIJZhKGYIYnBncAL5H6IkfxEDg8VXBgbmCQixpJkMDNtbGRgkbiHEVBYwMPC3MDBsO48QQ4RJQWJRIliIBYiZ0tIYGD4tZ2DgjWRgEL7AwMAVDQsIHG5TALvNnSEfCNMZchhSgSKeDHkMyQx6QJYRgwGDIYMZAKbWPz9HbOBQAAAkv0lEQVR42tWcebRdd3XfP/v3O+fOb57f02DJsixLli1ZngHLAmxsHEiApQwtadIuGmdlaGla6EpXWvHI0KRpUwpJmpkmCxLCS5oBEsxgkMDEo2TLtiRrHp/ePN35nnN+v90/7n1P8gSm4IGz1l3r3PPuve939tnDd3/33j95x03rfzIV8gvplNuSzWA62pR8pk57LiBIeax4rCiKAiBGMaJo8+3rfogIIoLBY0Qw1rT+YrDWYK1gRHAWJI4x2iDMgjVd2LQjpE6+sJrOtW/GmgxaeRxbeoIGQhIn1OqGxBkm5lI8cShFkA71dzoKmmtvi7S3Wxnu93TkI9qyEZmMEFqHGA+iGBFQC8CyvOQV3JTyfOnKK/rWt/8tQRDT/DWRpmBEFBEBiTDWIgKiMR7B5q/FFK5CpUK4uB9j6+CrFPr7Gb7tv+OTx0jOHycopjAuC66GBg5JVzl72nDiDAT5rOba8pFfPyJm1YhnVV9Md4d3KeM0lRJSgUM1obWqlWW/4Dm/spttqaWIfNeataLxYpvrEkHVBtYGgEEIm+uUAqRHiH1AZngn7cN3gylQefJ+fGMeY4cIOofwtYdZOv672IuPkh5ehU33o5Hgo5iUPglSoq3QQ5BJRzrUXzdXr1NGumKuGAl8Z3/Boh7CGqgHDZ631BcLTZpvX06e3062+go/9yLVViBonhsLTmiUKzgnCGkSrULHetq2/g0QUJ/6b5Sf+y90bP1NMoHDSoNk4D5SvW9DnvtZ7GJETAdtmSug51p8kCc6+xTpBAJryaWFoK/bymCvMNRXZ7AXX/Fd5qtfzv1jNr30tXQaCTRUvAED4DGY563f41/yvsxLXPMvI4Pv9LMewBoCA+KNBAE6Phf1PH3G/odf+sjHg3ShH1wZghQLUyV+5398iNCG+OozpNwFeg/+Fvfe99Mc3vcxTLHKlpEMtWqFdP8Ggo570UIG3DgWQ2AaYBJwgqgj6O5s0FUA44zHGPPAQ5lf/8BHD/0i32fHz//igb6bdzzw7/7sb8ZtYM+LWEs2yDEzd5G9X/xzrEAhG9KeUzonPkdX3wjtq+8nl1ukevLz0HkTUlhF0HsrJkzQhSmSpWNQPg+pBLHgfUxQyBja26o6OGJMqVSY/cBHj3xEVWXsIxL23Ym/8w0uqEN9u82WmTH/dNuh1UPDb06P7vmQxtV5jKtTXTxPnM7R2dYB1tGeceSznkIm5OKB32Pbv/4E+YxQPPRNOjfvIq5a4kYF62qQLKGLx5DSPEnBkoglk80QhGFENp1ob1daDj4n1c2bN6sxoqrEjKJvdM3as2fMXDuKv2PHT8dr1q/jV3/94/T0r+fAI3/L2J9+BBNm0VodgyeXE/JZZXVXxN1vbsee/B+UC1fQecVmfKmG6X0TIXWiqX/AzB/BlCZI5RrMVODceIN6nMEY4xEUnNKI1Rw+fFi+n0xxdBS/B8zFpcqxhemLd330P/9b/eBPv4NzE+f0Az/7m0gtIptVOjoiejsaXNnneeuuHEHOEnRvIt95Pc63g2tgpY1k4Rh2/nFSpQlsqkocFKk2POVKlnrDEoTGkgotxoCxAYCK8IYBpq/0OHGCxuo+f3x24rzxySLE76B7aD1RvMBAXwcBcMOmPNdf1Uau20H7WyG1FofFuAbWCCoWrUeEcQVNxSxVI7I5pd5w1CKlWleMkSaaFwF5yXj1faBlLbBhEldGzVR7IcvkqWf1wvgRbn37+2hPVdm4JmDjSEB7R4oovBKTWw9BDmOUIEjwcRHVOkFQZqkyzXMXy5RrBsGgicXFhsQFGG2iPxSP8n17KMCDj5fm4qQ6mc9nOXb4Gxx65HP80Lt/lKu27uTWWwcYWCOUTT+5rtsQsojWEeeJiwssnT+Fr1doJI4jJyIe/HqRUlVBLA2nRLEhicB4hcQpgmK+f0UmgNx666psJmU7rIno7c7hJ/+Jff/4a9z1E39N2Pl2So1+go5NOLIoirEW35gnKT1LVHsKwXPsLDxzKmGpGFJvWBSInZI4xassCwxEDYH//pTWT+0gENB2ZkZyWTfU3QEd2aoMX3MLt77zfmaf+hC12gRB73UE+UGQEEODePYcfuo50u40AwM1bDZisRpwcVEpVsG5EETxrikjr4IxKiv5mG2q2PeVv9+zB/MH+4n7BwbyqbT/0mCPTfd3BmxaG8q27dfSO7yNFI/QNpImO7AeCdMY8dRmT9M4dxCZO0tSS9j/dINGOaRadUxPeuYXlci1iAJncQqJh0BF8YrxilaqyQCwXpWju8GMgXsjC2v3buzoKO5dd9j35nJzP9jVHq4b7jZ602YjI/0BnTlIvCM3fDOWHlwjg/cxFM9hZp4kJVPUjOf4KcOjh2qsfWtCnMSUSom6WoA6leU0TbWZ4xuHongMojhNFeBagGl4w+OxzZtRwASB/3BvQf7FcA/x6sGGbNtiGRnqpkyIMY4gHCQhB1GCrZVh8Sham8FklZk6HDy2wFLNkqilHokWqyJxQwQnK7wCKogqgVkhBhQPxLAA0M8bOgKYn9qB/fzn4d43BX/W167Xdbeb6KpBSd25Y4TaQplk5AfoWvce/OSDYCMkZXCLZ2H2MMnCBYJCiq8/UeHkmYiZikkuziiJSznvJT25qL/bnSTeiPyciHfLJKBXxbRYEvWKSedkvgFPCzD2BhXYTggAf7TQkR/JZp4baA9/ZKQ7yK4f8qm73pwlF0KmbzPh4CYsXWgtQshjiheQiWeJ545hsjX2PjbN/qMVPT6Z+KlFG0zNxkFoJJ3P9Rx+7DAfapR1Ci8gKKJoS60CVUFFFZBMxpRpaRhvLIHJnj3IxOexf7Cf+I5tXDUQVP5XZ7es7+5wesdtab12XUo6gizafRWy4d8jzhOVnyHVfyc69Vn8zDME0Rwua9l3oMJjhxI/V1QzXzJSrekvlCq6tG/v1+z8fP04UC03/Gzi1Rv1gjYpSTFCgAYgigr4Jt0U8MZz9jraJAL8zu3pDV355MM9HXpve07j9SPZ8KrhmN5ciko8RJDaQEr70OQ0JplBsutJZo4R+HmqvsbFpQwnz5dYrGKmFpmtVXXv332j8nHAfeknfnVZVeRx8X8apuWXxWmvxyjqxaMEzZSoqW5G5I2gWbJ7N2Z6GrnzTvzoKP6eeza0B9WpLanAZ3wU/8ZAT3DT2kETXTlsUrfdGDDYHVKtXkkwcBNB2yAsPYBPlrDpYeK4RGXxArn2BgdO1nn0UI3JWasXp9384lJm5wOPlQ/v3o2dnib4yEf2sHfvXkbNvgQItenrn5dQBKra5Nr1lXPzrxqmAjMKfmzMOIB9++C+2/N/HpQv3g2upy1ryHcKnXnnN10Rpu7b1U29OE0c3kgwfCNBey8iFp9KYGGeuJHC5DxtXXkOHV/i4FHVxTIyNR9RrMjbH3isfPizu7E/PNZEDrt2jV5eo1EnlwTWrE4ZglYqiYisFCleF2e+k2B0H8m2DanNg93xL0exOlXajJbuCYH2rrwW8l7b0yob16XNzddZovIU6dyNSN+NGLsGTecRcTDzNNHcUaSrDZU0jx44ydSCp1xJ0agY4gisNUuAHBprgnW+XamhBekDxLcqOq8vAB0bI3nT1bzrtp3bPrzrnve8OQhCrFUUo43KHAe+/AmRoCJXr8pz8/aEvk6LC24k0YBUYDFt3WitRLRwDHfuaYJ4jlJykPFZy6rbPsqxf/wMM/OPEdFBo+FI6hp+J4mqoni/UnJ5XrlHXnMzHMPfd0vvjtjN/8nQyHDvO9/z4fjUsX8wteIUYSq0iSvQmfpxWPoS63qXGO6ylLI3kx/eTuXEN5CLx3HdCS5J484+SkrPUNMsh559jPHZY2x46y9x5Y73MF+B04ePkEkViALXgEj3gv0WNZcVZRLAGFkWGIgopplLvqYRcu9ODPtIlOiW9hy9XkzDuWL6K5/9TaZPPU62zdHbt4b3/+In0DPPYuanqflt5PpvQkKPz6zB1c4QTj5FEvRSaUyT70tx7mLEcyegJjUOfux+fu6XPk39pvdy+PCvYDOuEZS4fufmvsa+wzOTlxejvl0J0Cx7uFa+lO6AttfDLFMmvT1lA7XUrDGWru4sg/051q7uYU1Xg9KBXyGZOU2SXkOweitOS8w+8yDpjnayI9vwmXb83BNkgzr79pd4+KkitZohih29gwP8nz/ZQy6bldHf+iu6ervDzrT8RUd3ffSdt3WufZlK6ApalVZ65FUxLW9mvIo2qkl/ATaqwm5effp1927svn0kd28Jbg9N9JOZtNWeQjYQaeMdP/pfWbf9VjYOR9xyU5lM/QguWU+UvRNJ2qlOX6DjyjeRzvXjFk9B9UmCQpmnjld49kTEhTmoxJ56VWioZWHqNMZWGBzeiNGahVI2l3E/ZcT9PuB3727e786dWBS2FPgRjV2XiDjBixrBYjAsw4pLYn7NWLHNm9E9ezBkzX8LMnGQyQiuOMPJI39KvmuENWs20tteJRcKml6N6b6esH0dQp2wPkcq3UOjdoGwdAxx85ybDjg1FVOteRo1oRKBBCHGGzZufSu9Q5twccyOW+5l17v+mWvrHnIuTp6nWf39TSO0AW+i2U6il2Qjy7CipXOvbaQ0o6P4d7wlN9SWNdflMmhvtxf14zzzT39JR77K2qFpaq6HSnk1qaGtJJl2bDyN1mYITEJ89kuIHmMpnmWhlOOxA1Um50IqpYT2rjVku7qZHn8Ok5R527vvZ8PmHwLK/Iuf+W2mJp+RY0dO2POnxsPlOAiweaxVH2hZ2rJZqirqfVNgl2uY8ppUQmT3biQ61tGZNGp/0z2Qyvd1iPa2B2bDlh3c8cO/TeX4B5GFh8mlr8Hk+yCA6sxxUtE8QahQd9SrB0nlLM+cgOPnKjQaGaxJEUULXHPzLra95Qf5s98ZJZeuMLc4SfvEQdRH1Ko1fuuXf4bp8QvnMrnsBagvU0WXFigkvOACIgTaTIm8Md6ksnamDMdEYExfPdPcvZlwbIzojm1h36r26Oa+rlD7ujGDPY5cxgEBLlK0fRDTSJC5g1TmO+hcvwur19CYfISovJ+2jjRPHG1w8ryjEWWYnF2kXgtZKEYsVCqsWnMX/+k3tgMFxv7kw/zVH4ySyuZZnG1ElVJV4nry+XKD39uzBzM6+iKcKggtwgKazDQEzRampkqGgdSXoPQqAjHZsYNgbD/RXVvtvR3ZpZ/rzhnflU2kEChDXQkjA3kUwWYGMWFM4gQNIDOwDlePiGvnCcxZKBgOnm4wseCZm61BupMfeP9vEWS68AbKizN86vd/itDmUAk4/vQjNGqxVislrVeTVL0OToNTOF9n9CXQhH++9DweRZsm+QKY/2rIawUZ799P/M4dmR9ry/Mr3R2yfmQo64cGYrPqmrdx5Q3b6e5bD8SE+TZs0I5iiYMASaVoTBwhbByl1hjn6dNpTh2vsFBNGNpyL1dtfS83vuXdfO2rn8XVHCefPcyDD3ySbJDSSiNRMWmy6dA0IidRrJ+O6vrYP+6v/Dbgv3K5E1tesAHRy2+gqVjB5beTeA37ID0L8feMxwIZbUXenZv7CoVM5eogiP+4s0A2n7NJbxdBb1vCFRs2M7TxZ2jSTw7CAHURQTpNEOZIlsZJxc9ggwoXZ9s4fi7CtV1Brd7gyq1v4/rb3834uYP8xf/+r5RnpjRI58hne9UlkbEGSZyytOQm44SjX9hfef/l5bmXC3eXczdqmrbZdPpejFer9aobzMLVquz/Losgsns3ZmwMNwr61mvzA4V0PBaEi+vaCqlVXR0pN9htfEcXwepB4aatg5jqF5g9naX3in8DQGN+mjit5FOKK5eoTB+ns1DlzEXHN54skem6hft+8tdAOvncpz/BH338JgqFvA9i0TCdsy5RGmUn5Sg+gEt/zJikZNKZB7/w6Fxpzx7M3r2Yffte4NhfCuiviFTxqgQrIvRmWdEy3y0Y/asx3NgY7p7t+etSKf97hZSu6elIj4RZ6O4w9PUktrvd09MdcMOmTtKpGlZKJJkEpIF4C0EfQdftFKcvsHTyL7BhjkMHp7k4AXNzAUvnj3B0z7+lkYR+bvysX5xdoBikAuegUnclq5LEcfXjxPb3v/jc4kRzdeVma8EonleAN/WyZHLZPAOWE0vxzqgGqSxbqfHN6Z0I+74zYe3YQTg2RvzWaxnIBOmP5bO8vb8v7M1lDZ2FlO9sS6Qt52T7lnb6e0NCEbICaq9COjuQuePMNz5D9xX/nOzguyDdQ371Etn+q8HmyG8Laez7a554+o8oFqssLR3AucDEPm2CIE255B5Cg1F1yXNKWPniM5WF5YcIMNbivV6JhVi51NHbajzBiBBIsxe5KUSFwHLzbvhD+r9jGCv79xPfvS1/VzbQ9+bS+qNtbdDehsvlnelpWzLdHTl6191O/5Yh2jlMWDpGgx6Cnk6chATzp8hEEHVtIShsQkw7tcYi9UpMo1HFa4FqPaZY8ZQj4xMtiFP7bN0nT9lGtBjH+tSXnq18pbmc2oobGhv7jl2LeiXWF9FhSkCrCUVVDQqh5Z6j15F5eozKt3KIL6w+MwqPbcv8WCFjP9mWI9XRHSR9vRnb253Yzu4BhkfWkM0UuHrXz5HvuJq5U5+G6EE6O0cwhZhofpbIhGTNNJUT/xO/8T+SLtzK9HOf48z+jzM5m+bMRJWF+YTKkvhqzZlaHJ8qLcQ7Hzq3UrhZ5tb8/2chR0ZBrxvI95uo0kL6zeRItFnBDQRFRTEWDY1IynJm/dXU3/N0ky5+RWWvUfw3r2YwK/7THW1CNhsn7dl60N/m6c1GbLjhn7Fl16/iKQHteBw9638cXf8TeDeNLv4hYTCHkEMTj6lchGQJkRCndUpLNWqVgFopoVRxcT32Ybmqe6tR8sNv+5cs2b3N4NW/D/3/0KZL/rcV6IKwvj2MWGUUh4pdrncYkWXgSrNBWvGB4dbTD3PDGDy+G+wY39LuZR8k+4AfyGY+0dVhNZeO/cjaq4L7fvyDpLNpMilPZ9/VxKUDVM79PWn1hIUCUToNwXrSvVuozE2gtTno34rtegcpUgSdWzh7+JMce+JB5os5puYSnV3wcaVCqlJhtpEkux86wezbRjH7+PbR7pUcy9V+6/TqwKDWqDaBgqBqUIXAL7t/adXYFEmUAsDmlunuuSy/3LuzeZ4dx9ZGcOGkfWcY8O9zObmjs1PoaVMzsKqHLTf9GFCjPjVGbWkvceUwmcohAjUkRcEP3QSFPkrn/pZU506kO0PQvZUkaefkwU8h0WM8d+DvOHvsGMVqhsmpSMpln1os+y8Uy/LBh04zu1w0+V6h6/4VylmvTlnEGmlieqGF85VguWAkLM/sQCh4QPauJbUWGD1LfeVX960sMOEE3LOVG9tz3JHJuriQs2FfF9LVFhFpFRsvkpz8A4LGDGFXP5muAbD91CbOYjO3kevdSfn8Z8EHWI2oTT3J+eee5tjDv0e5WuDiQsL0rGipWJfZuXgqcuazlYb744dOx8d27CAc3Y/je0cW6HQfWWaoiMikqILXZgeiupVCUWDUYqAZIvG0PmcAnakSDITyP4cG7B+GofuPBtpsKH+vxkdijAhyY8rKXUFgklzWBfmspaszoTMHgZ8FKaLZAcR0kwkKxA3BplOYVA5LBQjJD91C7cD7sW6RqRnh2JEKlXob84vK7BTMzDupVEXLNfOZLz1b/+AyfNm//3uWjawcZWHdrUOEqPkq+I82qR1dQbCisgxcdZmv9lYwomb7jiH/qBHSYoNvWnUPbx5uM93tCd7qXQ0KnLqwgAmV9g6hvWDo71EGehq09Xg6UkfgmX9FNV0gtfm/YGaOEs99BdM1iBbHyXQNYXmSyrlHiScP0JWrc/58yOGjDS7OhCwWG8zPozPzTpbKrliPgl8PvPnkbWvsDziXeuqx/bULtwxwxfdCSJGgeY8lw0IUm50I016ZeF6QlWX86glELlWNvEdEwahelwrsR1zi19Rq8ae2rc2a7dcNRdlUwx46fk4nphVJB+TyMb3d1g73Ij947zBdHTHGOsIwgugC2fZN2PRaapyifuEYmXqRVN9akniG2qnTRPUa+XCW/YdqXJiGizMRFycts3NOq3WRhUV19YbbPW6ivYVyakOg9u8EN3HLiP2/gtz/veDuUpAQEsSOXxKj14A/bwMumBeEkaZJmlbluyVJVYx3qBhzj/P6XC4bblvTn/qRTWsDveGGNal6pBw4fI6ai8jkA/IBBHGCKwYsnHGs3mRJpWJckiWpp6nNxKTTX8R7JRi4FhqnkUYZszBDun6e0AjnFhOOnq8zN2+Zn4f5uURLJdVKFW3UVaK6FA+fJbp9jd7QHIfUEfW8V5d7Q75bx7WMGIysMUq3iHzVKdctD8i9iCZe0S5RRFQS0FDMQL0qv9nTZs5tWw+b1/XohpEOetsyWCDMC305S2cKQh9AtcA/fG6RyVM5dCqHnimg8yHxzAx68A/JaI3Ule9GvaIzp0gWpmhInelymUcfW2R8QpmYijl/MWFyxsn8YmSK5YY0GomJlF+8dVX4AVX9XefVecUjMgKErXLEd/siUVS93i2iG2IlFq9DL2Ts1esy0n/B8Gezw04RUngvGjfQpRnOPv51JooBWCFloc0lrFo9SFdPL9H4Ao3IES4pdLfhAkeltEjPNVeBlvHWod5giYijGVyY5shJy/GTVcanLBNznmJJWVxSKlWpR5FU1NOtHrzXYTESGaHNaTMq6qVhw+8Fd6e26c9PKYynjP19VCN14L0El0xSnq9hKzyigFiRQFBjwEsIiaNgLekgRJ2jK2+olmOuf+t93HDnuzl1/BxvWZtjMAqoPr5I5fgUXRuG8FJGTA0bJHhfw9UnyXR6Ts9c5PDJEpNzlsnZmJk5x1JRk6jhiRL380msHzFiFDEuMHrWkGyw4I2gtvnCXjr/rl+t3w1FkNBKW2Ckp0nr6PN9vzEv8AHNIKqCNgvoeKwmqKSJUdoKAQPd7ZyYLdLfkyLflgWT4D30WIgri5hVKfKD7YjUMa7A7PEpCkMx9GdBYWJqiQsTjvmlgPlSTKVqqNfRRl1pxOLV87Ni/ISIGkRIWfM+Qd+XeCGU1iDG97LxDGxgwSsh0O2cn/eifywhHxIRB9hlcOGbVaMm9lMUF4DJYo005aUCXgRBSRJPbrCD+97/Ns7MLjLSmefKTVcyc/4UPauyPDJb5fq6MrIqi01lSIplGvOOoGpIzj2CFM9gvHLufIPz4zHFolAsC0tFpV5T8V4Co6Be82LMxxLnfkVENFa8iKig9tWoAvpmei2hMfORsTWc6wG/K8iASanqZXl8M5dsiVlBTSCCZd6rtietSGpp9ls7Y8jmU2y4cQPX9gw3A3JYoDE9ydBIL48cG2dVvp818yGJxEiHp3Jxjv5N7TD/FNFSAxkcYqFeo1xfoFpXqg2jsfMSx5xSkaNe/d+Ys/6Tl3LDhNfquO0K1oY+vPXrZ+PPvmWt/VxTq9RcjisECC65zpYxKk6akTItTuM4URYSw3XDqxnubWP66/9AJdPB8NZbCIc3kkkbbt+6ieJ8kc5rhzDXd5AUl6hORPRdU8DlQpJ0jqR/I5lr7mP+G7/L0sI8paqlWvXeebHO6Zcbif6RMfIfgivMO9+s+oz39u9tgHHJq1uJt4pxgjcqWxX/x2+5wvy0qIx4D9oMgSsOvklRr8RPEQUs9BkgTPELOFb5yDNTtfLAI6fJaMS2zavYcvc6nvi/n2L1nT9I0Ij4xtceom/1Wr55fJqvHj5L3Xu6sp733X0Ff/3AGRbrlmu3V7ij0GBh5iSLS1ArQ6OOjeqgmPtD6+8PpBmujOgPeav/GQVrX33tslzKd4zILu+Xw5++yOEFTVk5DAbrZKXvJxRuCmxAOm00ajh57EyVpFZnzRWCbWunPLmIm5tl8MY3c/v9P097by/nH9tHZsAhxrL3M1/jj/72HEE6JNAaT35jgrOn5zl/ttTSLkcSuWYtocmZq18eqWuq/2s6iyhIkytU9SLG4j3qW+NqapuGaFpNwS1WHxc16R9vPYkTX47FTFSN4GPmyiCJ4eT5Re5wGXr7+ghrF7BMsu5tWyFJg58gUx9HreHa2zbx+MPH6WjLMbkUMb1U52w5olISSqWERgyxg1jBqYLqi3cReVUF9KJK5DIOtQgqTsU3pDlDutKnv1zIJWheCAUjzf4LE1iWaok+fdInVjTECl0ZiBoO5z3r3rSV6ukjFB99CFl3FbWip2v7Jib/8hmKEyfYtOtWpseXOPD0RWarCbFXjLFEVUcOiBODTwzqtNl/Ja99Q/LlhdpWcths/kUlEAitafp1ifBkUTUtHyaCIyHbJtiUEKtoKkxM7MwpET6WsubjDe+9cdZExQbThw6x+uabCdIh5775BBMPH0CxXJ+6F6hRLpbY/4VvcuTQJGdmhXoCEGJ8xLrBFO3pLEfO1Fmcqy+FgU0jZF6XyUN5kX7h1TS896fzOTblOlDnEcFgjWu2bGoLZwmK0winTYonUT0oQo8Y868bsdOh9qwMtSkdHSH1C9NU2s6QXdfL+nvfztBimUxgyPf1U7rREPb0cO7x4yRVR6kk1DEYiTCxR3yOdFq9CbxR4Z+c0fUGrkZF5RKR8toI7IXtmEbwHgVZ9ALe1Ft799gmiFAl8MZj1KOtLGlZeN4Fv4a6PYHo1sGO0K/tcKbdGqJijQvnFjl78iFMXzdBTwFrFKOQTh1jyx3X079pIxcOHmfzhlXMVaZZqDVwoqTbMqxa04X3sYldHYF7RcH55r/Wl7uT10jZvGtOEIXCraogapvktIBXcwlW6AqBKBjBOC8g+r8KKTsw0Bb6q/uM2b5rC+pDntr7KE+enOfo+RKV+inwirWQUhjshZ5V/QytHqBcXWCoJ+D6KyA/uJEwn2bqwjj5rOfZExVK1QQR8XjEviiEvz4DFsuTH84vTyt7vHq0maVhXphLighWm04/VDfYlwm4dhjJ5IXtb74Vscrxg09xcVo4vwSRs0CIiieLJ133NGqKK8fMzJVJB5DPhWy/+QY6ejr5pwce5MiZRQ4dn6NaF2xgjOgbZwrM0BxTvhzhy/PICV1mXGH5MwKoTxjqyejm1Vlpywr3feB9PPP4AU7uP8X4nOHQhTKJt2BjRGOseNaP5BkuxBz4ykMcSmWYmnZUHfhEOfPnX8QFQtJIODzeoJaY5sZo6i9p04tC1us5xtPsn1D1qHqM2ktI37d2eMMJzifUPKzrSbG+M5Frrl/Lrh+5l8e/+FVOPvoMZyc8hycjykkrifem2fymQiGlGBNz/uQcRpSyC3n2bESsHtGo2cVtLNWoNcAj2iLeLm+TeT1FJC2k34QW6gSwqA8wPsZ7g2IJhABvLE4SMkGavrzQm0rYeNUQq64aZnZugskj05ybjBivWqp1vAlD0+zBU0SbYWK2qJTrtomrMNQ9LMRKosvbhyiCAwneoNuJ6GVKbfHeN4UmihPTDIoYgup8RLHbsDAvVCcNd13TRfuqHrbtuoGoGPG3v/EpFqIcB2YCKpWYVMqYZlRrQT3jiICT07XW/22OWwoJaoVUkxhBxbSGW/3KdOsbUWjammcwBoIgRq2nHqXx3uOdI5g+1SCrIV22jUMHimy7YTMbb7ie8bkpvvyXX6ZUMzw1WaEeKTYllVh0nxF/b5MnttIUh4A1NAe9fKvGCc40c0WjHr9iidIS9usvtBW32XJLiiKiOBzWQi5nWZrvxpsqiYM4Cgi2rx0gqTX4yucusnH1CENDQ8yeGefsoWMcGa9xeLLlXhRUySjcbsyyTPxL3rY8j/J2ryyefwsU/m3h2bfa/k/gRc/nsusKGLOcfDfTNN+AG9+SwdFgsZinXG+wVLHETjToKDTouGqArffdRDy/xNlTJ5hfKjI1U2fdtf10rnXNWZJmvm5FtFO/jzfpuVxmyzPwLE8lq8Wqsn5tzD3v9BgjXKzMMn4hzcJiiKIS5HMdZLKWjZuGSRjik1/6DJ3dCXe/a5A11zhUqxjTDKsigpgmHnl+49jLmNhLdpctV1p4/gaQ3+78OxaHvOzaRJpls9bI9rLXQr3Bi8XmeyguzHLylOHCRc/MkmotsjK7EB0NOnqy2EadpVNT2OE+akmDq1d10zlSY3FmhjB0YHS5axHTGhj0Xle2KvUtlWvmYpfO1TdzCDGykouZ1rlvPYBmD3xzPwhBWtcvO299v1lEZOX7urxVSWvw0xhZAZcrHVy+WTY00lzXym8tr4vmtqZJossuh0YSoAvdzC1azk1EXJgOWCimWVoK4igKC5Ic/QWtjF/kxN5HKaphcbbG2bkK7YOOrdtCHLWmukrzZlVe+NjlJRRCmz5hea/Vla1EXvAZadFgl7EFl297uoxfV65eFjD0hcool/nNF2iacPm+r9IaGF1ue7P4VkTy3lOPYKkkLBZTTMylmJyF6fmQUtWWYxf+98A7yHUMYJI8Rx5+jkYqzaxANUzjjgeAEFiDiNLc40JeHr/oy9VXX9gtal7m75eLXr5NsrzS4PAydmxe0qovf2DNNwZVWdHoWkMpVSylimVmUalUrdYbAd6x4J3/2P8DOv3AoPLMoUAAAAAASUVORK5CYII=" class="item-icon" alt="Sword of Light - Orr"><span>By. Slayer Girl</span><img src="data:image/png;base64,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" class="item-icon" alt="Orb of Hope"></div>
+        <p>Hitung kebutuhan diamond minimum untuk mencapai target pity summon.</p>
+      </div>
+      
+    </header>
+
+    <section class="card">
+      <h2>1. Target</h2>
+      <div class="grid two">
+        <label>
+          Progress sekarang
+          <input id="current" type="number" min="0" step="1" value="0">
+        </label>
+        <label>
+          Target Pity
+          <select id="target"><option value="100">Lv. 2 selected — 100 summon — Reward: 4× Rare 2</option><option value="250">Lv. 3 — 250 summon — Reward: 4× Epic 2</option><option value="1000">Lv. 4 — 1.000 summon — Reward: 4× Legendary 2</option><option value="4000">Lv. 5 — 4.000 summon — Reward: 2× Mythic 4</option><option value="12000">Lv. 6 — 12.000 summon — Reward: 1× Mythic 1</option><option value="25000">Lv. 7 — 25.000 summon — Reward: 2× Mythic 1</option><option value="27500">Lv. 7.5 — 27.500 summon — Reward: 3× Mythic 1</option><option value="55000">Lv. 8 — 55.000 summon — Reward: 3× Mythic 1</option>
+            <option value="10000">LV 8+ — +10.000 summon — Reward: 1× M1</option></select>
+        </label>
+      </div>
+      <div class="shortage">
+        <span>Kekurangan summon</span>
+        <strong id="shortage">4.220</strong>
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="section-head">
+        <div>
+          <h2>2. PILIH MODE SUMMON</h2>
+          <p>Pilih salah satu mode summon yang ingin digunakan.</p>
+        </div>
+      </div>
+      <div class="single-mode">
+        <label class="mode-option selected">
+          <input type="radio" name="summonMode" value="1" checked>
+          <span class="radio"></span>
+          <span><b>1x Gacha</b><small>Memberikan 1 summon</small></span>
+          <strong>50 💎</strong>
+        </label>
+        <label class="mode-option">
+          <input type="radio" name="summonMode" value="11">
+          <span class="radio"></span>
+          <span><b>11x Gacha</b><small>Memberikan 11 summon</small></span>
+          <strong>500 💎</strong>
+        </label>
+        <label class="mode-option">
+          <input type="radio" name="summonMode" value="33">
+          <span class="radio"></span>
+          <span><b>33x Gacha</b><small>Memberikan 33 summon</small></span>
+          <strong>1.500 💎</strong>
+        </label>
+      </div>
+    </section>
+
+    <section class="card result-card">
+      <div class="section-head">
+        <div>
+          <h2>3. Hasil minimum</h2>
+          <p>Hasil diperbarui otomatis saat angka diubah.</p>
+        </div>
+        
+      </div>
+
+      <div class="result-grid">
+        <div class="result-box main-result">
+          <span>Diamond minimum</span>
+          <strong id="minDiamonds">0</strong>
+          <small>diamond</small>
+        </div>
+        <div class="result-box">
+          <span>Total summon</span>
+          <strong id="totalSummons">0</strong>
+        </div>
+        <div class="result-box">
+          <span>Kelebihan</span>
+          <strong id="overshoot">0</strong>
+          <small>summon</small>
+        </div>
+        <div class="result-box">
+          <span>Efisiensi</span>
+          <strong id="efficiency">0%</strong>
+          <small>diamond / summon</small>
+        </div>
+      </div></section>
+    <section class="card purchase-card">
+      <div class="section-head">
+        <div>
+          <h2>4. Rincian pembelian</h2>
+          <p>Paket yang digunakan akan tampil sesuai mode summon.</p>
+        </div>
+      </div>
+      <div class="breakdown">
+        <h3>Rincian pembelian</h3>
+        <div id="breakdownList" class="breakdown-list"></div>
+      </div>
+    </section>
+
+    
+  <div class="bottom-reset">
+  <button id="resetAll" class="ghost-btn" type="button">↻ &nbsp; Reset Semua</button>
+</div>
+</main>
+  <script>
+const $ = (id) => document.getElementById(id);
+const STORAGE_KEY = "universalGachaCalculator_v1";
+
+let options = [
+  { name: "Summon x1", qty: 1, cost: 50 },
+  { name: "Summon x11", qty: 11, cost: 500 }
+];
+
+function fmt(n) {
+  return Number(n).toLocaleString("id-ID");
+}
+
+function save() {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify({
+    current: $("current").value,
+    target: $("target").value,
+    options,
+    notes: $("notes") ? $("notes").value : ""
+  }));
+}
+
+function load() {
+  try {
+    const data = JSON.parse(localStorage.getItem(STORAGE_KEY) || "null");
+    if (!data) return;
+    if (data.current !== undefined) $("current").value = data.current;
+    if (data.target !== undefined) $("target").value = data.target;
+    if (Array.isArray(data.options) && data.options.length) options = data.options;
+    if (data.notes !== undefined && $("notes")) $("notes").value = data.notes;
+  } catch (_) {}
+}
+
+function renderOptions() {
+  const body = $("optionsBody");
+  body.innerHTML = "";
+
+  options.forEach((opt, i) => {
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td><input type="text" value="${escapeHtml(opt.name)}" data-i="${i}" data-field="name"></td>
+      <td><input type="number" min="1" step="1" value="${opt.qty}" data-i="${i}" data-field="qty"></td>
+      <td><input type="number" min="0" step="1" value="${opt.cost}" data-i="${i}" data-field="cost"></td>
+      <td><button class="delete-btn" title="Hapus paket" data-delete="${i}" type="button">×</button></td>
+    `;
+    body.appendChild(tr);
+  });
+
+  body.querySelectorAll("input").forEach(input => {
+    input.addEventListener("input", (e) => {
+      const i = Number(e.target.dataset.i);
+      const field = e.target.dataset.field;
+      options[i][field] = field === "name" ? e.target.value : Number(e.target.value);
+      save();
+      calculate();
+    });
+  });
+
+  body.querySelectorAll("[data-delete]").forEach(btn => {
+    btn.addEventListener("click", () => {
+      if (options.length <= 1) return;
+      options.splice(Number(btn.dataset.delete), 1);
+      save();
+      renderOptions();
+      calculate();
+    });
+  });
+}
+
+function escapeHtml(str) {
+  return String(str ?? "").replace(/[&<>"']/g, ch => ({
+    "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#039;"
+  }[ch]));
+}
+
+/*
+  Unbounded dynamic programming:
+  dp[s] = minimum diamond needed to reach exactly s summons.
+  Because packages can overshoot the target, calculate up to target + maxPackageQty - 1.
+  Tie-breaker: lower cost first, then fewer summons in the final solution.
+*/
+function solve(shortage, validOptions) {
+  if (shortage <= 0) return { cost: 0, summons: 0, counts: Array(validOptions.length).fill(0) };
+
+  const maxQty = Math.max(...validOptions.map(o => o.qty));
+  const limit = shortage + maxQty - 1;
+  const INF = Number.MAX_SAFE_INTEGER;
+  const dpCost = new Array(limit + 1).fill(INF);
+  const dpCount = new Array(limit + 1).fill(INF);
+  const prev = new Array(limit + 1).fill(null);
+
+  dpCost[0] = 0;
+  dpCount[0] = 0;
+
+  for (let s = 0; s <= limit; s++) {
+    if (dpCost[s] === INF) continue;
+    for (let i = 0; i < validOptions.length; i++) {
+      const o = validOptions[i];
+      const ns = s + o.qty;
+      if (ns > limit) continue;
+
+      const nc = dpCost[s] + o.cost;
+      const nn = dpCount[s] + o.qty;
+
+      if (nc < dpCost[ns] || (nc === dpCost[ns] && nn < dpCount[ns])) {
+        dpCost[ns] = nc;
+        dpCount[ns] = nn;
+        prev[ns] = { from: s, index: i };
+      }
+    }
+  }
+
+  let bestS = -1;
+  for (let s = shortage; s <= limit; s++) {
+    if (dpCost[s] === INF) continue;
+    if (bestS === -1 ||
+        dpCost[s] < dpCost[bestS] ||
+        (dpCost[s] === dpCost[bestS] && s < bestS)) {
+      bestS = s;
+    }
+  }
+
+  if (bestS === -1) return null;
+
+  const counts = Array(validOptions.length).fill(0);
+  let cur = bestS;
+  while (cur > 0 && prev[cur]) {
+    counts[prev[cur].index]++;
+    cur = prev[cur].from;
+  }
+
+  return { cost: dpCost[bestS], summons: bestS, counts };
+}
+
+function calculate() {
+  const current = Math.max(0, Math.floor(Number($("current").value) || 0));
+  const target = Math.max(0, Math.floor(Number($("target").value) || 0));
+  const shortage = Math.max(0, target - current);
+  $("shortage").textContent = fmt(shortage);
+
+  const validOptions = options
+    .map((o, originalIndex) => ({
+      ...o,
+      originalIndex,
+      qty: Math.floor(Number(o.qty)),
+      cost: Math.floor(Number(o.cost))
+    }))
+    .filter(o => o.qty > 0 && o.cost >= 0 && Number.isFinite(o.qty) && Number.isFinite(o.cost));
+
+  if (shortage === 0) {
+    showResult({ cost: 0, summons: 0, counts: Array(validOptions.length).fill(0) }, validOptions);
+    setStatus("Target tercapai", false);
+    return;
+  }
+
+  if (!validOptions.length) {
+    showResult(null, []);
+    setStatus("Tambahkan paket summon", true);
+    return;
+  }
+
+  const result = solve(shortage, validOptions);
+
+  if (!result) {
+    showResult(null, validOptions);
+    setStatus("Kombinasi tidak ditemukan", true);
+    return;
+  }
+
+  showResult(result, validOptions);
+  setStatus("Optimal", false);
+}
+
+function showResult(result, validOptions) {
+  const list = $("breakdownList");
+  list.innerHTML = "";
+
+  if (!result) {
+    $("minDiamonds").textContent = "0";
+    $("totalSummons").textContent = "0";
+    $("overshoot").textContent = "0";
+    $("efficiency").textContent = "0%";
+    list.innerHTML = '<div class="empty">Pastikan jumlah summon dan harga paket valid.</div>';
+    return;
+  }
+
+  $("minDiamonds").textContent = fmt(result.cost);
+  $("totalSummons").textContent = fmt(result.summons);
+
+  const shortage = Math.max(0, Math.floor(Number($("target").value) || 0) -
+                               Math.max(0, Math.floor(Number($("current").value) || 0)));
+  $("overshoot").textContent = fmt(Math.max(0, result.summons - shortage));
+  $("efficiency").textContent = result.summons ? (result.cost / result.summons).toFixed(2) : "0";
+
+  let hasRows = false;
+  result.counts.forEach((count, i) => {
+    if (!count) return;
+    hasRows = true;
+    const o = validOptions[i];
+    const row = document.createElement("div");
+    row.className = "breakdown-row";
+    row.innerHTML = `
+      <div class="name">${escapeHtml(o.name || `Paket ${i + 1}`)}</div>
+      <div class="qty">${fmt(count)} × ${fmt(o.qty)} summon</div>
+      <div class="cost">${fmt(count * o.cost)} 💎</div>
+    `;
+    list.appendChild(row);
+  });
+
+  if (!hasRows) list.innerHTML = '<div class="empty">Tidak ada pembelian yang diperlukan.</div>';
+}
+
+function setStatus(text, error) {
+  const el = $("status");
+  el.textContent = text;
+  el.classList.toggle("error", !!error);
+}
+
+$("current").addEventListener("input", () => { save(); calculate(); });
+$("target").addEventListener("input", () => { save(); calculate(); });
+if ($("notes")) $("notes").addEventListener("input", save);
+
+$("addOption").addEventListener("click", () => {
+  const n = options.length + 1;
+  options.push({ name: `Paket ${n}`, qty: 1, cost: 0 });
+  save();
+  renderOptions();
+  calculate();
+});
+
+$("resetAll").addEventListener("click", () => {
+  if (!confirm("Reset semua data ke contoh awal?")) return;
+  localStorage.removeItem(STORAGE_KEY);
+  $("current").value = 20780;
+  $("target").value = 25000;
+  $("notes").value = "";
+  options = [
+    { name: "Summon x1", qty: 1, cost: 50 },
+    { name: "Summon x11", qty: 11, cost: 500 }
+  ];
+  renderOptions();
+  calculate();
+});
+
+load();
+renderOptions();
+calculate();
+
+</script>
+
+<style>
+.byline{display:flex;justify-content:center;align-items:center;gap:10px;color:#fff;font-size:17px;font-weight:700;margin:8px 0 16px}
+.item-icon{width:52px;height:52px;object-fit:cover;border-radius:8px;border:1px solid #9c7413;box-shadow:0 0 10px rgba(255,181,27,.22)}
+.single-mode{display:flex;flex-direction:column;gap:10px}
+.mode-option{position:relative;display:grid;grid-template-columns:30px 1fr auto;gap:10px;align-items:center;padding:13px;border:1px solid #394252;border-radius:12px;background:#0e131b;cursor:pointer}
+.mode-option input{position:absolute;opacity:0}
+.mode-option.selected{border-color:#36a7ff;box-shadow:inset 0 0 0 1px rgba(54,167,255,.2)}
+.mode-option .radio{width:24px;height:24px;border:3px solid #747e8e;border-radius:50%;display:block;position:relative}
+.mode-option.selected .radio{border-color:#36a7ff}
+.mode-option.selected .radio:after{content:"";position:absolute;width:10px;height:10px;border-radius:50%;background:#36a7ff;left:4px;top:4px}
+.mode-option b{display:block;font-size:16px}
+.mode-option small{display:block;color:#9ca5b7;margin-top:3px}
+.mode-option strong{white-space:nowrap;font-size:16px}
+@media(max-width:560px){.item-icon{width:46px;height:46px}}
+</style>
+
+<script>
+(function(){
+const $=id=>document.getElementById(id);
+const current=$("current"), target=$("target");
+const shortage=$("shortage"), minD=$("minDiamonds"), totalS=$("totalSummons"), over=$("overshoot"), eff=$("efficiency"), list=$("breakdownList");
+const modes=document.querySelectorAll('input[name="summonMode"]');
+
+function fmt(n){return Number(n).toLocaleString("id-ID")}
+function mode(){
+ const v=document.querySelector('input[name="summonMode"]:checked')?.value||"1";
+ if(v==="33") return {qty:33,cost:1500,name:"33x Gacha"};
+ if(v==="11") return {qty:11,cost:500,name:"11x Gacha"};
+ return {qty:1,cost:50,name:"1x Gacha"};
+}
+function calc(){
+ let c=Math.max(0,Math.floor(Number(current.value)||0));
+ let t=Math.max(0,Math.floor(Number(target.value)||0));
+ let need=Math.max(0,t-c), m=mode(), count=need?Math.ceil(need/m.qty):0;
+ let got=count*m.qty, cost=count*m.cost;
+ shortage.textContent=fmt(need);
+ minD.textContent=fmt(cost);
+ totalS.textContent=fmt(got);
+ over.textContent=fmt(got-need);
+ eff.textContent=got?(cost/got).toFixed(2):"—";
+ list.innerHTML='<div class="breakdown-row"><div class="name">'+m.name+'</div><div class="qty">'+fmt(count)+' kali ('+fmt(got)+' summon)</div><div class="cost">'+fmt(cost)+' 💎</div></div>';
+ modes.forEach(x=>x.closest("label").classList.toggle("selected",x.checked));
+ localStorage.setItem("gachaV13",JSON.stringify({c,t,m:m.qty}));
+}
+try{
+ const d=JSON.parse(localStorage.getItem("gachaV13")||"null");
+ if(d){
+   current.value=d.c??0;
+   target.value=d.t??0;
+   let r=document.querySelector('input[name="summonMode"][value="'+([1,11,33].includes(d.m)?d.m:1)+'"]');
+   if(r)r.checked=true;
+ }
+}catch(e){}
+[current,target].forEach(x=>x.addEventListener("input",calc));
+modes.forEach(x=>x.addEventListener("change",calc));
+$("resetAll")?.addEventListener("click",()=>{
+ current.value=0;target.value=0;
+ document.querySelector('input[name="summonMode"][value="1"]').checked=true;
+ localStorage.removeItem("gachaV13");calc();
+});
+calc();
+})();
+</script>
+<script>
+(function(){
+  const current=document.getElementById("current");
+  const target=document.getElementById("target");
+  const shortage=document.getElementById("shortage");
+  const minD=document.getElementById("minDiamonds");
+  const totalS=document.getElementById("totalSummons");
+  const over=document.getElementById("overshoot");
+  const eff=document.getElementById("efficiency");
+  const list=document.getElementById("breakdownList");
+  const modes=document.querySelectorAll('input[name="summonMode"]');
+
+  const fmt=n=>Number(n).toLocaleString("id-ID");
+  function getMode(){
+    const v=document.querySelector('input[name="summonMode"]:checked')?.value||"1";
+    if(v==="33") return {qty:33,cost:1500,name:"33x Gacha"};
+    if(v==="11") return {qty:11,cost:500,name:"11x Gacha"};
+    return {qty:1,cost:50,name:"1x Gacha"};
+  }
+  function calculateV4(){
+    const c=Math.max(0,Math.floor(Number(current.value)||0));
+    const t=Math.max(0,Math.floor(Number(target.value)||0));
+    const need=Math.max(0,t-c);
+    const m=getMode();
+    const count=need?Math.ceil(need/m.qty):0;
+    const got=count*m.qty;
+    const cost=count*m.cost;
+    shortage.textContent=fmt(need);
+    minD.textContent=fmt(cost);
+    totalS.textContent=fmt(got);
+    over.textContent=fmt(got-need);
+    eff.textContent=got?(cost/got).toFixed(2):"—";
+    list.innerHTML='<div class="breakdown-row"><div class="name">'+m.name+'</div><div class="qty">'+fmt(count)+' kali ('+fmt(got)+' summon)</div><div class="cost">'+fmt(cost)+' 💎</div></div>';
+    modes.forEach(x=>x.closest("label")?.classList.toggle("selected",x.checked));
+    localStorage.setItem("gachaV13",JSON.stringify({current:c,target:t,mode:m.qty}));
+  }
+  try{
+    const d=JSON.parse(localStorage.getItem("gachaV13")||"null");
+    if(d){
+      current.value=d.current??0;
+      target.value=String(d.target??100);
+      const r=document.querySelector('input[name="summonMode"][value="'+([1,11,33].includes(d.mode)?d.mode:1)+'"]');
+      if(r) r.checked=true;
+    }
+  }catch(e){}
+  current.addEventListener("input",calculateV4);
+  target.addEventListener("change",calculateV4);
+  modes.forEach(x=>x.addEventListener("change",calculateV4));
+  calculateV4();
+})();
+</script>
+<script>
+(function(){
+  const el = document.getElementById("current");
+  if(!el) return;
+
+  function cleanLeadingZeros(){
+    const raw = el.value;
+    if(raw === "") return;
+    const cleaned = raw.replace(/^0+(?=\d)/, "");
+    if(cleaned !== raw) {
+      const pos = el.selectionStart;
+      el.value = cleaned;
+      if(pos !== null) {
+        const newPos = Math.max(0, pos - (raw.length - cleaned.length));
+        try { el.setSelectionRange(newPos, newPos); } catch(e) {}
+      }
+    }
+  }
+
+  el.addEventListener("input", cleanLeadingZeros);
+  el.addEventListener("blur", cleanLeadingZeros);
+})();
+</script>
+
+<script>
+(function(){
+  function initGachaCalculator(){
+    const current = document.getElementById("current");
+    const target = document.getElementById("target");
+    const shortage = document.getElementById("shortage");
+    const minD = document.getElementById("minDiamonds");
+    const totalS = document.getElementById("totalSummons");
+    const over = document.getElementById("overshoot");
+    const eff = document.getElementById("efficiency");
+    const list = document.getElementById("breakdownList");
+    const modes = document.querySelectorAll('input[name="summonMode"]');
+
+    if(!current || !target || !shortage || !minD || !totalS || !over || !eff || !list) return;
+
+    const fmt = n => Number(n).toLocaleString("id-ID");
+
+    function cleanCurrent(){
+      if(current.value !== "") {
+        current.value = current.value.replace(/^0+(?=\d)/, "");
+      }
+      if(current.value === "") current.value = "0";
+    }
+
+    function getMode(){
+      const selected = document.querySelector('input[name="summonMode"]:checked');
+      const value = selected ? selected.value : "1";
+      if(value === "33") return {qty:33, cost:1500, name:"33x Gacha"};
+      if(value === "11") return {qty:11, cost:500, name:"11x Gacha"};
+      return {qty:1, cost:50, name:"1x Gacha"};
+    }
+
+    function calculate(){
+      cleanCurrent();
+
+      const c = Math.max(0, Math.floor(Number(current.value) || 0));
+      const t = Math.max(0, Math.floor(Number(target.value) || 0));
+      const need = Math.max(0, t - c);
+      const m = getMode();
+
+      const count = need === 0 ? 0 : Math.ceil(need / m.qty);
+      const got = count * m.qty;
+      const cost = count * m.cost;
+      const excess = Math.max(0, got - need);
+
+      shortage.textContent = fmt(need);
+      minD.textContent = fmt(cost);
+      totalS.textContent = fmt(got);
+      over.textContent = fmt(excess);
+      eff.textContent = got ? (cost / got).toFixed(2) : "—";
+
+      if(need === 0){
+        list.innerHTML = '<div class="breakdown-row"><div class="name">Target pity tercapai</div><div class="qty">Tidak perlu summon tambahan</div><div class="cost">0 💎</div></div>';
+      } else {
+        list.innerHTML =
+          '<div class="breakdown-row">' +
+          '<div class="name">'+m.name+'</div>' +
+          '<div class="qty">'+fmt(count)+' kali ('+fmt(got)+' summon)</div>' +
+          '<div class="cost">'+fmt(cost)+' 💎</div>' +
+          '</div>';
+      }
+
+      modes.forEach(x => {
+        const label = x.closest("label");
+        if(label) label.classList.toggle("selected", x.checked);
+      });
+
+      try {
+        localStorage.setItem("gachaV13", JSON.stringify({
+          current:c, target:t, mode:m.qty
+        }));
+      } catch(e){}
+    }
+
+    // Restore saved values, but keep the target pity selector valid.
+    try {
+      const saved = JSON.parse(localStorage.getItem("gachaV13") || "null");
+      if(saved){
+        current.value = String(Math.max(0, Math.floor(Number(saved.current) || 0)));
+        const option = Array.from(target.options).find(o => Number(o.value) === Number(saved.target));
+        if(option) target.value = option.value;
+        const savedMode = [1,11,33].includes(Number(saved.mode)) ? Number(saved.mode) : 1;
+        const radio = document.querySelector('input[name="summonMode"][value="'+savedMode+'"]');
+        if(radio) radio.checked = true;
+      }
+    } catch(e){}
+
+    current.addEventListener("input", calculate);
+    current.addEventListener("change", calculate);
+    current.addEventListener("blur", calculate);
+    target.addEventListener("change", calculate);
+    modes.forEach(x => x.addEventListener("change", calculate));
+
+    // Recalculate button, if present.
+    const recalc = document.getElementById("calculate");
+    if(recalc) recalc.addEventListener("click", calculate);
+
+    // Reset button, if present.
+    const reset = document.getElementById("resetAll");
+    if(reset) reset.addEventListener("click", function(){
+      current.value = "0";
+      if(Array.from(target.options).some(o => o.value === "25000")) target.value = "100";
+      const one = document.querySelector('input[name="summonMode"][value="1"]');
+      if(one) one.checked = true;
+      try { localStorage.removeItem("gachaV13"); } catch(e){}
+      // Reset result display to the standard initial zero state.
+      $("shortage").textContent = "0";
+      $("minDiamonds").textContent = "0";
+      $("totalSummons").textContent = "0";
+      $("overshoot").textContent = "0";
+      $("efficiency").textContent = "0%";
+      $("breakdownList").innerHTML = "";
+      if (typeof window.updateResultTheme === "function") window.updateResultTheme();
+    });
+
+    calculate();
+  }
+
+  if(document.readyState === "loading"){
+    document.addEventListener("DOMContentLoaded", initGachaCalculator);
+  } else {
+    initGachaCalculator();
+  }
+})();
+</script>
+<script>
+(function(){
+  const target=document.getElementById("target");
+  const reward=document.getElementById("selectedPityReward");
+  if(!target || !reward) return;
+  const rewards={
+    "100":"4× Rare 2",
+    "250":"4× Epic 2",
+    "1000":"4× Legendary 2",
+    "4000":"2× Mythic 4",
+    "12000":"1× Mythic 1",
+    "25000":"2× Mythic 1",
+    "27500":"3× Mythic 1",
+    "55000":"3× Mythic 1",
+    "10000":"1× M1"
+  };
+  function updateReward(){
+    reward.textContent="Reward: "+(rewards[target.value]||"—");
+  }
+  target.addEventListener("change",updateReward);
+  updateReward();
+})();
+</script>
+<script>
+(function(){
+  const title=document.querySelector("header h1");
+  if(title) title.setAttribute("aria-label","Kalkulator Gacha Weapon dan Accessories");
+})();
+</script>
+
+<style>
+/* ===== v17 responsive layout ===== */
+.container{
+  width:min(calc(100% - 24px), 760px);
+}
+.hero{
+  text-align:center;
+}
+.hero .ghost-btn{display:none}
+.card{margin-bottom:14px}
+.bottom-reset{
+  display:flex;
+  justify-content:center;
+  margin:14px 0 4px;
+}
+.bottom-reset .ghost-btn{
+  width:min(100%,360px);
+  min-height:46px;
+  background:linear-gradient(180deg,#242a34,#171c24);
+  border:1px solid #4a5566;
+  color:#f2f4f8;
+  border-radius:11px;
+  box-shadow:0 8px 18px rgba(0,0,0,.18);
+}
+.bottom-reset .ghost-btn:hover{
+  border-color:#ffc51b;
+  color:#fff;
+}
+
+/* Portrait phone */
+@media (orientation:portrait) and (max-width:700px){
+  .container{
+    width:calc(100% - 16px);
+    max-width:620px;
+    padding:14px 0 24px;
+  }
+  header{padding:4px 5px 14px}
+  header h1{font-size:clamp(25px,7vw,34px)!important}
+  .byline{margin:9px auto 13px!important}
+  .info{font-size:13px;padding:12px}
+  .card{padding:14px;border-radius:14px}
+  .grid.two{grid-template-columns:1fr}
+  .result-grid{grid-template-columns:1fr}
+  .main-result{grid-column:auto}
+  .shortage{min-height:92px}
+  .mode-option{grid-template-columns:30px 1fr auto}
+  .bottom-reset{margin-top:12px}
+}
+
+/* Landscape phone/tablet: use available width and compact vertical spacing */
+@media (orientation:landscape) and (max-height:700px){
+  .container{
+    width:min(calc(100% - 28px), 1080px);
+    padding:12px 0 18px;
+  }
+  header{
+    padding:2px 10px 10px;
+    margin-bottom:8px;
+  }
+  header h1{
+    font-size:clamp(24px,4.2vw,36px)!important;
+  }
+  .byline{
+    margin:5px auto 9px!important;
+  }
+  .byline .item-icon{
+    width:42px!important;height:42px!important;
+  }
+  .byline span{font-size:15px}
+  .info{padding:9px 13px;margin-bottom:10px;font-size:12px}
+  .card{
+    padding:12px 14px;
+    margin-bottom:10px;
+    border-radius:13px;
+  }
+  .section-title{font-size:16px;margin-bottom:9px}
+  .grid.two{
+    grid-template-columns:1fr 1fr;
+    gap:10px;
+  }
+  .shortage{min-height:82px}
+  .mode-option{padding:9px 11px}
+  .mode-option small{font-size:11px}
+  .result-grid{
+    grid-template-columns:1fr 1.35fr;
+    gap:9px;
+  }
+  .box{padding:10px}
+  .breakdown-row{padding:8px 10px}
+  .bottom-reset{margin:8px 0 0}
+  .bottom-reset .ghost-btn{
+    min-height:40px;
+    padding:9px 14px;
+    width:220px;
+  }
+}
+
+/* Wider landscape screens */
+@media (orientation:landscape) and (min-width:701px){
+  .container{width:min(calc(100% - 40px),1100px)}
+  .grid.two{grid-template-columns:1fr 1fr}
+  .result-grid{grid-template-columns:1fr 1.35fr}
+}
+</style>
+
+<style>
+/* v18 — landscape header tetap mengikuti posisi tengah seperti portrait */
+@media (orientation: landscape) {
+  header{
+    width:100%!important;
+    display:flex!important;
+    flex-direction:column!important;
+    align-items:center!important;
+    justify-content:center!important;
+    text-align:center!important;
+    margin-left:auto!important;
+    margin-right:auto!important;
+  }
+  header h1{
+    width:100%!important;
+    text-align:center!important;
+    margin-left:auto!important;
+    margin-right:auto!important;
+  }
+  header h1 span{
+    display:block!important;
+    text-align:center!important;
+  }
+  .byline{
+    width:100%!important;
+    justify-content:center!important;
+    align-items:center!important;
+    text-align:center!important;
+    margin-left:auto!important;
+    margin-right:auto!important;
+  }
+  .hero > div{
+    width:100%!important;
+    display:flex!important;
+    flex-direction:column!important;
+    align-items:center!important;
+    text-align:center!important;
+  }
+  .hero > div p{
+    text-align:center!important;
+  }
+}
+</style>
+
+<style>
+/* v20 — restrained responsive optimization based on the preferred template */
+*{box-sizing:border-box}
+html,body{width:100%;min-height:100%;overflow-x:hidden}
+.container{
+  width:min(calc(100% - 24px),1180px)!important;
+  margin:0 auto!important;
+}
+header{
+  width:100%!important;
+  text-align:center!important;
+  margin:0 auto!important;
+}
+header h1,
+header h1 span,
+.byline{
+  text-align:center!important;
+  margin-left:auto!important;
+  margin-right:auto!important;
+}
+.byline{
+  justify-content:center!important;
+}
+
+/* Keep cards visually close to the version the user liked. */
+.card{
+  min-width:0;
+}
+.grid.two,
+.result-grid{
+  min-width:0;
+}
+label, .field, .box, .mode-option, .breakdown-row{
+  min-width:0;
+}
+input,select,button{
+  max-width:100%;
+}
+
+/* Landscape: use the width efficiently, but don't over-compress the UI. */
+@media (orientation:landscape) and (min-width:701px){
+  .container{
+    width:min(calc(100% - 32px),1180px)!important;
+    padding-top:12px!important;
+  }
+  header{
+    padding-top:4px!important;
+    padding-bottom:12px!important;
+  }
+  header h1{font-size:clamp(32px,4.2vw,52px)!important}
+  .byline{margin-top:7px!important;margin-bottom:10px!important}
+  .hero>div{text-align:center!important}
+
+  /* First data area: four balanced cards/columns where the existing
+     grid structure permits it. */
+  .grid.two{
+    grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important;
+  }
+  .result-grid{
+    grid-template-columns:minmax(0,1fr) minmax(0,1.25fr)!important;
+  }
+  .main-result{grid-column:auto!important}
+
+  .card{
+    padding:14px!important;
+    margin-bottom:12px!important;
+  }
+  .mode-option{
+    padding:11px!important;
+  }
+  .bottom-reset{
+    margin-top:10px!important;
+  }
+}
+
+/* Portrait: clean single-column flow with comfortable touch targets. */
+@media (orientation:portrait){
+  .container{
+    width:calc(100% - 14px)!important;
+    max-width:620px!important;
+    padding-top:10px!important;
+  }
+  header{
+    padding-bottom:12px!important;
+  }
+  header h1{
+    font-size:clamp(28px,8vw,40px)!important;
+  }
+  .byline{
+    margin-top:8px!important;
+    margin-bottom:12px!important;
+  }
+  .grid.two,
+  .result-grid{
+    grid-template-columns:1fr!important;
+  }
+  .main-result{
+    grid-column:auto!important;
+  }
+  .card{
+    padding:13px!important;
+    margin-bottom:11px!important;
+  }
+  .mode-option{
+    min-height:56px!important;
+  }
+}
+
+/* Very small landscape phones: compact vertical spacing only. */
+@media (orientation:landscape) and (max-height:600px){
+  .container{
+    width:calc(100% - 18px)!important;
+    padding-top:7px!important;
+    padding-bottom:10px!important;
+  }
+  header{
+    padding-top:1px!important;
+    padding-bottom:7px!important;
+  }
+  header h1{font-size:clamp(24px,5vw,38px)!important}
+  .byline{margin-top:4px!important;margin-bottom:7px!important}
+  .byline span{font-size:14px!important}
+  .card{
+    padding:10px!important;
+    margin-bottom:8px!important;
+  }
+  .mode-option{padding:8px!important;min-height:50px!important}
+  .bottom-reset{margin-top:7px!important}
+}
+
+/* Small portrait phones */
+@media (orientation:portrait) and (max-width:430px){
+  .container{width:calc(100% - 10px)!important}
+  .card{padding:11px!important}
+  .byline span{font-size:15px!important}
+}
+</style>
+
+<style>
+/* v21 — Header recreated to match the supplied reference */
+.hero{
+  position:relative!important;
+  min-height:250px!important;
+  display:flex!important;
+  flex-direction:column!important;
+  align-items:center!important;
+  justify-content:center!important;
+  text-align:center!important;
+  padding:18px 120px 20px!important;
+  margin-bottom:10px!important;
+  overflow:hidden!important;
+  border-radius:14px;
+  background:
+    radial-gradient(ellipse at 50% 52%,rgba(95,39,170,.20),transparent 48%),
+    radial-gradient(ellipse at 50% 5%,rgba(255,193,35,.10),transparent 45%),
+    linear-gradient(180deg,#080b13 0%,#060911 100%);
+}
+.hero:before{
+  content:"";
+  position:absolute;
+  left:10%;
+  right:10%;
+  bottom:28px;
+  height:1px;
+  background:linear-gradient(90deg,transparent,rgba(255,193,35,.55),rgba(177,108,255,.35),rgba(255,193,35,.55),transparent);
+  box-shadow:0 0 16px rgba(255,193,35,.22);
+}
+.hero:after{
+  content:"";
+  position:absolute;
+  left:50%;
+  bottom:27px;
+  width:7px;height:7px;
+  transform:translateX(-50%) rotate(45deg);
+  border:1px solid rgba(255,193,35,.65);
+  background:#090b12;
+}
+.hero>div{
+  position:relative!important;
+  z-index:2;
+  width:100%!important;
+  display:flex!important;
+  flex-direction:column!important;
+  align-items:center!important;
+  justify-content:center!important;
+}
+.hero h1{
+  margin:0!important;
+  width:100%!important;
+  color:#ffd43d!important;
+  font-size:clamp(40px,5.2vw,76px)!important;
+  line-height:.95!important;
+  font-weight:950!important;
+  letter-spacing:-1.8px!important;
+  text-align:center!important;
+  text-shadow:
+    0 2px 0 #5b2600,
+    0 4px 0 #291200,
+    0 0 12px rgba(255,193,35,.34),
+    0 8px 20px rgba(0,0,0,.65)!important;
+}
+.hero h1 span{
+  display:block!important;
+  text-align:center!important;
+}
+.hero h1 span+span{
+  margin-top:10px!important;
+  color:#f4f6fb!important;
+  font-size:.48em!important;
+  letter-spacing:.7px!important;
+  text-shadow:0 2px 7px #000!important;
+}
+.hero .byline{
+  position:relative!important;
+  z-index:3;
+  width:auto!important;
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  gap:13px!important;
+  margin:10px auto 0!important;
+  color:#f4d7ff!important;
+  font-size:clamp(16px,2vw,25px)!important;
+  font-weight:800!important;
+  font-style:italic!important;
+  text-shadow:0 2px 8px rgba(0,0,0,.9),0 0 8px rgba(177,108,255,.28)!important;
+}
+.hero .byline .item-icon{
+  width:70px!important;height:70px!important;
+  object-fit:contain!important;
+  border:0!important;
+  border-radius:0!important;
+  box-shadow:none!important;
+  background:transparent!important;
+}
+.hero .byline .item-icon:first-child{
+  transform:rotate(-2deg);
+}
+.hero .byline .item-icon:last-child{
+  transform:rotate(2deg);
+}
+.hero>div p{display:none!important}
+
+/* Landscape: reproduce the reference proportions more closely */
+@media (orientation:landscape){
+  .hero{
+    min-height:250px!important;
+    padding:12px 150px 20px!important;
+  }
+  .hero .byline .item-icon{
+    width:92px!important;height:92px!important;
+  }
+  .hero .byline{
+    margin-top:11px!important;
+  }
+}
+
+/* Portrait: keep the same visual language without letting icons consume the page */
+@media (orientation:portrait){
+  .hero{
+    min-height:205px!important;
+    padding:15px 48px 24px!important;
+    border-radius:12px;
+  }
+  .hero h1{
+    font-size:clamp(31px,8.5vw,43px)!important;
+    letter-spacing:-.8px!important;
+  }
+  .hero h1 span+span{
+    margin-top:7px!important;
+    font-size:.52em!important;
+  }
+  .hero .byline{
+    margin-top:9px!important;
+    font-size:16px!important;
+  }
+  .hero .byline .item-icon{
+    width:55px!important;height:55px!important;
+  }
+  .hero:before{bottom:23px}
+  .hero:after{bottom:22px}
+}
+
+/* Very short landscape phones */
+@media (orientation:landscape) and (max-height:600px){
+  .hero{
+    min-height:190px!important;
+    padding:8px 110px 15px!important;
+  }
+  .hero h1{font-size:clamp(30px,5.3vw,48px)!important}
+  .hero .byline{margin-top:7px!important;font-size:15px!important}
+  .hero .byline .item-icon{width:60px!important;height:60px!important}
+}
+</style>
+
+<style id="v22-header">
+/* =====================================================
+   v22 — Explicit header recreation from supplied reference
+   ===================================================== */
+header.hero{
+  position:relative!important;
+  width:100%!important;
+  min-height:220px!important;
+  margin:0 auto 14px!important;
+  padding:24px 20px 18px!important;
+  display:flex!important;
+  flex-direction:column!important;
+  align-items:center!important;
+  justify-content:center!important;
+  text-align:center!important;
+  overflow:hidden!important;
+  border:1px solid rgba(112,84,28,.75)!important;
+  border-radius:16px!important;
+  background:
+    radial-gradient(ellipse at 50% 48%,rgba(74,30,116,.28) 0%,rgba(28,14,49,.16) 28%,transparent 57%),
+    radial-gradient(ellipse at 50% 105%,rgba(255,177,24,.08),transparent 48%),
+    linear-gradient(180deg,#080b12 0%,#05070c 100%)!important;
+  box-shadow:
+    inset 0 1px rgba(255,255,255,.08),
+    inset 0 -24px 55px rgba(54,20,86,.10),
+    0 10px 30px rgba(0,0,0,.28)!important;
+}
+header.hero:before{
+  content:""!important;
+  position:absolute!important;
+  left:18%!important;
+  right:18%!important;
+  bottom:26px!important;
+  height:1px!important;
+  background:linear-gradient(90deg,transparent,rgba(174,105,255,.75),rgba(255,199,45,.65),rgba(174,105,255,.75),transparent)!important;
+  box-shadow:0 0 12px rgba(176,101,255,.25)!important;
+}
+header.hero:after{
+  content:""!important;
+  position:absolute!important;
+  left:0!important;right:0!important;bottom:0!important;
+  height:70px!important;
+  background:linear-gradient(180deg,transparent,rgba(73,29,103,.09))!important;
+  pointer-events:none!important;
+}
+header.hero>div{
+  position:relative!important;
+  z-index:2!important;
+  width:100%!important;
+  display:flex!important;
+  flex-direction:column!important;
+  align-items:center!important;
+  justify-content:center!important;
+  text-align:center!important;
+}
+header.hero h1{
+  position:relative!important;
+  z-index:3!important;
+  margin:0!important;
+  padding:0!important;
+  width:100%!important;
+  color:#ffc62c!important;
+  font-family:Impact,Haettenschweiler,"Arial Black",sans-serif!important;
+  font-size:clamp(34px,5.5vw,72px)!important;
+  font-weight:900!important;
+  line-height:.95!important;
+  letter-spacing:1px!important;
+  text-align:center!important;
+  text-transform:uppercase!important;
+  text-shadow:
+    0 2px 0 #5a2700,
+    0 4px 0 #301300,
+    0 0 10px rgba(255,190,34,.45),
+    0 6px 18px rgba(0,0,0,.85)!important;
+}
+header.hero h1 span{
+  display:block!important;
+  width:100%!important;
+  text-align:center!important;
+}
+header.hero h1 span:first-child{
+  color:#ffc62c!important;
+}
+header.hero h1 span:last-child{
+  margin-top:9px!important;
+  color:#f4f5f8!important;
+  font-family:Impact,Haettenschweiler,"Arial Black",sans-serif!important;
+  font-size:.48em!important;
+  font-weight:900!important;
+  letter-spacing:1.2px!important;
+  text-shadow:0 2px 5px rgba(0,0,0,.95),0 0 8px rgba(255,255,255,.08)!important;
+}
+header.hero .byline{
+  position:relative!important;
+  z-index:3!important;
+  display:flex!important;
+  flex-direction:row!important;
+  align-items:center!important;
+  justify-content:center!important;
+  width:100%!important;
+  margin:13px auto 0!important;
+  gap:18px!important;
+  color:#fff!important;
+  text-align:center!important;
+}
+header.hero .byline .item-icon{
+  flex:0 0 auto!important;
+  width:64px!important;
+  height:64px!important;
+  object-fit:contain!important;
+  border:0!important;
+  border-radius:0!important;
+  box-shadow:none!important;
+  background:transparent!important;
+}
+header.hero .byline span{
+  color:#fff!important;
+  font-family:Georgia,"Times New Roman",serif!important;
+  font-size:clamp(17px,2.3vw,28px)!important;
+  font-weight:700!important;
+  font-style:italic!important;
+  letter-spacing:.3px!important;
+  text-shadow:0 0 7px rgba(199,135,255,.35),0 2px 5px #000!important;
+}
+header.hero p{
+  display:none!important;
+}
+
+/* Landscape reference proportions */
+@media (orientation:landscape){
+  header.hero{
+    min-height:235px!important;
+    padding-top:20px!important;
+  }
+  header.hero h1{font-size:clamp(38px,5.2vw,76px)!important}
+  header.hero .byline .item-icon{width:70px!important;height:70px!important}
+}
+
+/* Portrait: same design, scaled down rather than redesigned */
+@media (orientation:portrait){
+  header.hero{
+    min-height:180px!important;
+    padding:18px 10px 15px!important;
+    border-radius:13px!important;
+  }
+  header.hero h1{font-size:clamp(28px,8vw,42px)!important}
+  header.hero h1 span:last-child{
+    margin-top:6px!important;
+    font-size:.50em!important;
+  }
+  header.hero .byline{
+    gap:10px!important;
+    margin-top:10px!important;
+  }
+  header.hero .byline .item-icon{
+    width:48px!important;height:48px!important;
+  }
+  header.hero .byline span{font-size:16px!important}
+  header.hero:before{left:12%;right:12%;bottom:21px!important}
+}
+
+@media (orientation:portrait) and (max-width:430px){
+  header.hero{min-height:165px!important}
+  header.hero .byline .item-icon{width:43px!important;height:43px!important}
+  header.hero .byline span{font-size:15px!important}
+}
+</style>
+
+<style id="v23-clean-theme">
+:root{
+  --bg:#05070d; --panel:#090d14; --panel2:#0c111a;
+  --line:#252d3a; --gold:#ffc52b; --purple:#b56cff;
+  --blue:#45a8ff; --green:#72d84b; --orange:#ff8a30;
+}
+html,body{background:var(--bg)!important;color:#eef1f6}
+body{min-height:100vh;overflow-x:hidden}
+.container{
+  width:min(calc(100% - 24px),1500px)!important;
+  max-width:1500px!important;
+  margin:0 auto!important;
+  padding:14px 0 22px!important;
+}
+
+/* Header */
+header.hero{
+  position:relative!important;
+  min-height:220px!important;
+  padding:22px 24px 20px!important;
+  border:1px solid rgba(154,112,25,.78)!important;
+  border-radius:18px!important;
+  overflow:hidden!important;
+  background:
+    radial-gradient(ellipse at 50% 54%,rgba(88,28,130,.25),transparent 48%),
+    radial-gradient(ellipse at 50% 115%,rgba(255,178,25,.07),transparent 48%),
+    #070a11!important;
+  box-shadow:inset 0 1px rgba(255,255,255,.08),0 12px 30px rgba(0,0,0,.25)!important;
+}
+header.hero>div{
+  position:relative!important;z-index:2!important;
+  width:100%!important;height:100%!important;
+  display:flex!important;flex-direction:column!important;
+  align-items:center!important;justify-content:center!important;
+  text-align:center!important;
+}
+header.hero h1{
+  margin:0!important;width:100%!important;
+  font-family:Impact,"Arial Black",sans-serif!important;
+  text-align:center!important;text-transform:uppercase!important;
+  line-height:.96!important;letter-spacing:1px!important;
+  color:var(--gold)!important;
+  font-size:clamp(38px,5.1vw,76px)!important;
+  text-shadow:0 2px 0 #572800,0 4px 0 #2b1200,0 0 12px rgba(255,196,45,.42),0 6px 16px #000!important;
+}
+header.hero h1 span{display:block!important;text-align:center!important}
+header.hero h1 span:last-child{
+  margin-top:9px!important;color:#f4f5f8!important;
+  font-size:.47em!important;letter-spacing:1.2px!important;
+  text-shadow:0 2px 5px #000!important;
+}
+header.hero .byline{
+  display:flex!important;align-items:center!important;justify-content:center!important;
+  gap:18px!important;width:100%!important;margin:12px auto 0!important;
+}
+header.hero .byline .item-icon{
+  width:62px!important;height:62px!important;object-fit:contain!important;
+  border:0!important;border-radius:0!important;box-shadow:none!important;background:transparent!important;
+}
+header.hero .byline span{
+  color:#fff!important;font-family:Georgia,"Times New Roman",serif!important;
+  font-size:clamp(17px,2.1vw,27px)!important;font-style:italic!important;font-weight:700!important;
+  text-shadow:0 0 8px rgba(190,116,255,.35),0 2px 4px #000!important;
+}
+header.hero:after{
+  content:"";position:absolute;left:16%;right:16%;bottom:25px;height:1px;
+  background:linear-gradient(90deg,transparent,#9e5be6,#f1bd36,#9e5be6,transparent);
+  box-shadow:0 0 9px rgba(174,91,230,.3);z-index:1;
+}
+header.hero p{display:none!important}
+
+/* Cards */
+.card{
+  min-width:0!important;
+  background:linear-gradient(145deg,rgba(10,14,21,.98),rgba(6,9,14,.98))!important;
+  border:1px solid var(--line)!important;border-radius:12px!important;
+  box-shadow:0 8px 22px rgba(0,0,0,.18),inset 0 1px rgba(255,255,255,.025)!important;
+}
+.card:before{display:none!important}
+.card h2,.section-title{
+  font-size:clamp(16px,1.55vw,24px)!important;
+  letter-spacing:.3px!important;
+}
+
+/* Inputs and selectors */
+#current,#target{
+  min-height:44px!important;width:100%!important;
+  background:#0a0f17!important;border:1px solid #303949!important;
+  border-radius:8px!important;color:#fff!important;
+}
+#current:focus,#target:focus{border-color:var(--gold)!important;outline:none}
+.selected-pity-reward{color:var(--gold)!important}
+
+/* summon options */
+.mode-option{
+  min-width:0!important;min-height:62px!important;
+  background:#0a0f16!important;border:1px solid #293341!important;
+  border-radius:9px!important;transition:.15s!important;
+}
+.mode-option.selected{
+  border-color:var(--blue)!important;
+  background:linear-gradient(100deg,rgba(20,56,90,.68),rgba(8,13,20,.98))!important;
+  box-shadow:0 0 0 1px rgba(69,168,255,.12)!important;
+}
+
+/* result areas */
+.box,.result-grid .box,.breakdown-row{
+  background:#090e15!important;border:1px solid #273140!important;border-radius:9px!important;
+}
+.main-result{background:linear-gradient(145deg,#091725,#080d14)!important;border-color:rgba(69,168,255,.3)!important}
+.shortage{background:#090d14!important;border-color:rgba(181,108,255,.35)!important}
+
+/* Reset */
+.bottom-reset{display:flex!important;justify-content:center!important;margin:14px auto 0!important}
+.bottom-reset .ghost-btn{
+  width:min(320px,90vw)!important;min-height:44px!important;
+  border-radius:8px!important;border:1px solid #d94040!important;
+  background:linear-gradient(180deg,#2a0d11,#17080b)!important;
+  color:#ff9a9a!important;font-weight:800!important;
+}
+
+/* Landscape */
+@media (orientation:landscape){
+  .container{width:min(calc(100% - 32px),1500px)!important}
+  header.hero{min-height:225px!important}
+  .grid.two{grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important}
+  .result-grid{grid-template-columns:minmax(0,1fr) minmax(0,1.4fr)!important}
+  .main-result{grid-column:auto!important}
+}
+
+/* Portrait */
+@media (orientation:portrait){
+  .container{width:calc(100% - 12px)!important;max-width:620px!important}
+  header.hero{min-height:175px!important;padding:17px 10px 16px!important;border-radius:14px!important}
+  header.hero h1{font-size:clamp(27px,8vw,43px)!important}
+  header.hero h1 span:last-child{margin-top:6px!important}
+  header.hero .byline{gap:10px!important;margin-top:9px!important}
+  header.hero .byline .item-icon{width:45px!important;height:45px!important}
+  header.hero .byline span{font-size:15px!important}
+  header.hero:after{left:10%;right:10%;bottom:19px!important}
+  .grid.two,.result-grid{grid-template-columns:1fr!important}
+  .main-result{grid-column:auto!important}
+}
+
+/* Small landscape phones */
+@media (orientation:landscape) and (max-height:650px){
+  .container{width:calc(100% - 18px)!important;padding-top:7px!important}
+  header.hero{min-height:170px!important;padding:12px 16px!important}
+  header.hero h1{font-size:clamp(27px,5.2vw,45px)!important}
+  header.hero .byline{margin-top:7px!important}
+  header.hero .byline .item-icon{width:46px!important;height:46px!important}
+  header.hero .byline span{font-size:15px!important}
+  .card{padding:10px!important}
+  .mode-option{min-height:52px!important}
+}
+</style>
+
+
+
+
+
+<style id="v26-authoritative">
+/* =========================================================
+   V26 — clean authoritative layout
+   No inherited pseudo-elements or conflicting layout rules.
+   ========================================================= */
+html,body{
+  margin:0!important;padding:0!important;
+  width:100%!important;min-height:100%!important;
+  background:#03060b!important;color:#f4f5f7!important;
+}
+body{
+  overflow-x:hidden!important;
+  font-family:Arial,Helvetica,sans-serif!important;
+}
+body:before,body:after,main:before,main:after,
+header:before,header:after,
+.card:before,.card:after,
+.info:before,.info:after{
+  content:none!important;
+  display:none!important;
+}
+main.container{
+  width:calc(100% - 24px)!important;
+  max-width:1500px!important;
+  margin:0 auto!important;
+  padding:12px 0 24px!important;
+}
+
+/* ================= HEADER ================= */
+header.hero{
+  position:relative!important;
+  display:block!important;
+  width:100%!important;
+  height:235px!important;
+  min-height:235px!important;
+  margin:0 0 14px!important;
+  padding:0!important;
+  box-sizing:border-box!important;
+  overflow:hidden!important;
+  border:2px solid #765817!important;
+  border-radius:18px!important;
+  background:
+    radial-gradient(ellipse 55% 75% at 50% 58%,rgba(105,31,153,.25),transparent 65%),
+    linear-gradient(180deg,#080b12,#04070c)!important;
+  box-shadow:
+    inset 0 1px rgba(255,255,255,.07),
+    0 8px 26px rgba(0,0,0,.35)!important;
+}
+header.hero>div{
+  width:100%!important;
+  height:100%!important;
+  display:flex!important;
+  flex-direction:column!important;
+  align-items:center!important;
+  justify-content:center!important;
+  text-align:center!important;
+}
+header.hero h1{
+  width:100%!important;
+  margin:0!important;padding:0!important;
+  text-align:center!important;
+  font-family:Impact,"Arial Black",sans-serif!important;
+  font-size:clamp(42px,5.7vw,82px)!important;
+  line-height:.92!important;
+  letter-spacing:1px!important;
+  font-weight:900!important;
+  text-transform:uppercase!important;
+  color:#ffc52a!important;
+  text-shadow:2px 3px 0 #4c2000,0 0 12px rgba(255,190,40,.55),0 7px 14px #000!important;
+}
+header.hero h1 span{
+  display:block!important;width:100%!important;text-align:center!important;
+}
+header.hero h1 span:last-child{
+  margin-top:10px!important;
+  color:#f7f7f9!important;
+  font-size:.43em!important;
+  letter-spacing:1.2px!important;
+  text-shadow:0 2px 5px #000!important;
+}
+header.hero .byline{
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  width:100%!important;
+  margin:14px auto 0!important;
+  gap:18px!important;
+}
+header.hero .byline .item-icon{
+  width:66px!important;height:66px!important;
+  object-fit:contain!important;
+  display:block!important;
+  border:0!important;border-radius:0!important;
+  background:transparent!important;
+  box-shadow:none!important;
+}
+header.hero .byline span{
+  color:#fff!important;
+  font-family:Georgia,"Times New Roman",serif!important;
+  font-size:clamp(18px,2.1vw,28px)!important;
+  font-style:italic!important;font-weight:700!important;
+  text-shadow:0 0 8px rgba(190,115,255,.4),0 2px 4px #000!important;
+}
+header.hero p{display:none!important}
+
+/* ================= REAL CONTENT GRID ================= */
+/* The existing HTML has 3 top-level sections; lay out their internal
+   components without relying on fragile nth-of-type selectors. */
+main.container>section.card{
+  box-sizing:border-box!important;
+  background:linear-gradient(145deg,#090e15,#05090f)!important;
+  border:1px solid #27313e!important;
+  border-radius:12px!important;
+  box-shadow:0 7px 20px rgba(0,0,0,.22)!important;
+  min-width:0!important;
+}
+
+/* Inputs/selects */
+input,select{
+  max-width:100%!important;
+  box-sizing:border-box!important;
+}
+#current,#target{
+  width:100%!important;
+  min-height:44px!important;
+  background:#0a0f17!important;
+  border:1px solid #303a48!important;
+  border-radius:8px!important;
+}
+
+/* Summon choices */
+.mode-option{
+  box-sizing:border-box!important;
+  border:1px solid #293341!important;
+  border-radius:9px!important;
+  background:#090e15!important;
+  min-width:0!important;
+}
+.mode-option.selected{
+  border-color:#3fa8ff!important;
+  background:linear-gradient(100deg,rgba(17,55,91,.72),#080d14)!important;
+}
+
+/* Reset */
+.bottom-reset{
+  display:flex!important;
+  justify-content:center!important;
+  align-items:center!important;
+  width:100%!important;
+  margin:14px auto 0!important;
+}
+.bottom-reset .ghost-btn{
+  width:300px!important;
+  min-height:44px!important;
+  border:1px solid #df3e45!important;
+  border-radius:8px!important;
+  background:linear-gradient(#2a0e12,#16080a)!important;
+  color:#ff9b9f!important;
+}
+
+/* ================= LANDSCAPE ================= */
+@media (orientation:landscape) and (min-width:701px){
+  /* First section: target/progress area */
+  main.container>section.card{
+    width:100%!important;
+    margin:0 0 12px!important;
+  }
+  /* Use existing inner grids for horizontal composition. */
+  main.container>section.card:first-of-type{
+    display:block!important;
+  }
+  main.container>section.card:nth-of-type(2){
+    display:block!important;
+  }
+  main.container>section.card:nth-of-type(3){
+    display:block!important;
+  }
+  .grid.two{
+    grid-template-columns:repeat(2,minmax(0,1fr))!important;
+    gap:12px!important;
+  }
+  .result-grid{
+    grid-template-columns:minmax(0,1fr) minmax(0,1.35fr)!important;
+    gap:12px!important;
+  }
+}
+
+/* ================= PORTRAIT ================= */
+@media (orientation:portrait){
+  main.container{
+    width:calc(100% - 12px)!important;
+    max-width:620px!important;
+    padding-top:8px!important;
+  }
+  header.hero{
+    height:185px!important;
+    min-height:185px!important;
+    border-radius:14px!important;
+  }
+  header.hero h1{font-size:clamp(29px,8vw,43px)!important}
+  header.hero h1 span:last-child{margin-top:7px!important}
+  header.hero .byline{gap:9px!important;margin-top:9px!important}
+  header.hero .byline .item-icon{width:46px!important;height:46px!important}
+  header.hero .byline span{font-size:16px!important}
+  main.container>section.card{
+    width:100%!important;
+    margin:0 0 11px!important;
+  }
+  .grid.two,.result-grid{
+    grid-template-columns:1fr!important;
+  }
+}
+
+/* Small landscape phones */
+@media (orientation:landscape) and (max-height:650px){
+  main.container{width:calc(100% - 18px)!important}
+  header.hero{height:175px!important;min-height:175px!important}
+  header.hero h1{font-size:clamp(28px,5.2vw,48px)!important}
+  header.hero .byline .item-icon{width:48px!important;height:48px!important}
+  header.hero .byline span{font-size:16px!important}
+}
+</style>
+
+<style id="v27-remove-ready">
+/* Hide the standalone "Siap" status above Hasil Minimum */
+.ready-status,
+.result-status,
+.minimum-status,
+.status-ready,
+.status-bar{
+  display:none!important;
+}
+</style>
+
+<style id="v28-section-colors">
+/* ===== V28: section-specific gradients ===== */
+main.container > section.card:nth-of-type(1){
+  background:linear-gradient(145deg,#351116 0%,#210a10 52%,#12070b 100%)!important;
+  border-color:#6d2630!important;
+  box-shadow:inset 0 1px rgba(255,120,120,.08),0 8px 24px rgba(0,0,0,.22)!important;
+}
+main.container > section.card:nth-of-type(1) h2{
+  color:#ff727c!important;
+}
+main.container > section.card:nth-of-type(1) .shortage{
+  background:linear-gradient(135deg,rgba(100,25,35,.62),rgba(32,8,14,.92))!important;
+  border-color:#78303a!important;
+}
+
+main.container > section.card:nth-of-type(2){
+  background:linear-gradient(145deg,#0b2340 0%,#07172d 52%,#050d1b 100%)!important;
+  border-color:#1d4f80!important;
+  box-shadow:inset 0 1px rgba(90,170,255,.08),0 8px 24px rgba(0,0,0,.22)!important;
+}
+main.container > section.card:nth-of-type(2) h2{
+  color:#58aaff!important;
+}
+main.container > section.card:nth-of-type(2) .mode-option{
+  background:linear-gradient(145deg,rgba(9,29,52,.92),rgba(5,14,27,.98))!important;
+  border-color:#20466e!important;
+}
+main.container > section.card:nth-of-type(2) .mode-option.selected{
+  border-color:#43a9ff!important;
+  background:linear-gradient(145deg,rgba(19,68,110,.88),rgba(5,18,34,.98))!important;
+}
+
+main.container > section.card:nth-of-type(3){
+  transition:background .22s ease,border-color .22s ease,box-shadow .22s ease!important;
+}
+/* Less than 50% remaining shortage = green */
+main.container > section.card:nth-of-type(3).result-safe{
+  background:linear-gradient(145deg,#123b28 0%,#0b281c 52%,#07170f 100%)!important;
+  border-color:#2f7952!important;
+  box-shadow:inset 0 1px rgba(100,240,150,.08),0 8px 24px rgba(0,0,0,.22)!important;
+}
+main.container > section.card:nth-of-type(3).result-safe h2{
+  color:#72df92!important;
+}
+main.container > section.card:nth-of-type(3).result-safe .result-box{
+  background:linear-gradient(145deg,rgba(16,55,37,.75),rgba(7,22,15,.9))!important;
+  border-color:#286344!important;
+}
+main.container > section.card:nth-of-type(3).result-safe .main-result{
+  border-color:#3b9a68!important;
+}
+main.container > section.card:nth-of-type(3).result-safe .main-result strong{
+  color:#72df92!important;
+}
+
+/* More than 50% remaining shortage = gray */
+main.container > section.card:nth-of-type(3).result-high{
+  background:linear-gradient(145deg,#343a43 0%,#252b33 52%,#171c23 100%)!important;
+  border-color:#59616c!important;
+  box-shadow:inset 0 1px rgba(220,225,232,.07),0 8px 24px rgba(0,0,0,.22)!important;
+}
+main.container > section.card:nth-of-type(3).result-high h2{
+  color:#d5d9df!important;
+}
+main.container > section.card:nth-of-type(3).result-high .result-box{
+  background:linear-gradient(145deg,rgba(60,67,77,.72),rgba(25,30,37,.94))!important;
+  border-color:#59616c!important;
+}
+main.container > section.card:nth-of-type(3).result-high .main-result{
+  border-color:#727b87!important;
+}
+main.container > section.card:nth-of-type(3).result-high .main-result strong{
+  color:#e3e6eb!important;
+}
+</style>
+
+<script id="v28-result-theme">
+(function(){
+  function updateResultTheme(){
+    const cards=document.querySelectorAll('main.container > section.card');
+    const resultCard=cards[2];
+    if(!resultCard) return;
+
+    const target=Math.max(0,Math.floor(Number(document.getElementById('target')?.value)||0));
+    const current=Math.max(0,Math.floor(Number(document.getElementById('current')?.value)||0));
+    const shortage=Math.max(0,target-current);
+
+    resultCard.classList.remove('result-safe','result-high');
+
+    if(target<=0 || shortage/target < 0.5){
+      resultCard.classList.add('result-safe');
+    }else{
+      resultCard.classList.add('result-high');
+    }
+  }
+
+  window.updateResultTheme=updateResultTheme;
+
+  const oldCalculate=window.calculate;
+  if(typeof oldCalculate==='function'){
+    window.calculate=function(){
+      oldCalculate();
+      updateResultTheme();
+    };
+  }
+
+  document.addEventListener('DOMContentLoaded',updateResultTheme);
+  setTimeout(updateResultTheme,0);
+})();
+</script>
+
+<style id="v29-result-fix">
+/* Ensure calculated result values are visually prominent. */
+.shortage strong{display:inline-block!important;min-width:3ch!important}
+.result-box strong{display:block!important}
+</style>
+<script id="v29-result-fix-script">
+(function(){
+  function applyTheme(){
+    const resultCard=document.querySelector('main.container > section.card.result-card');
+    const target=document.getElementById('target');
+    const current=document.getElementById('current');
+    if(!resultCard || !target || !current) return;
+
+    const t=Math.max(0,Math.floor(Number(target.value)||0));
+    const c=Math.max(0,Math.floor(Number(current.value)||0));
+    const s=Math.max(0,t-c);
+
+    resultCard.classList.remove('result-safe','result-high');
+    if(t>0 && s/t < 0.5) resultCard.classList.add('result-safe');
+    else resultCard.classList.add('result-high');
+  }
+
+  function refresh(){
+    // calculate() lives in the original calculator IIFE. Its existing
+    // listeners now work after the guarded save() fix. Give the DOM one tick.
+    setTimeout(applyTheme,0);
+  }
+
+  document.addEventListener('DOMContentLoaded', function(){
+    const current=document.getElementById('current');
+    const target=document.getElementById('target');
+    if(current) ['input','change'].forEach(e=>current.addEventListener(e,refresh));
+    if(target) ['input','change'].forEach(e=>target.addEventListener(e,refresh));
+    document.querySelectorAll('input[name="summonMode"]').forEach(el=>{
+      el.addEventListener('change',refresh);
+    });
+    refresh();
+  });
+
+  // Handles pages where DOMContentLoaded already fired before this script.
+  if(document.readyState!=='loading') refresh();
+})();
+</script>
+
+<script id="v30-zero-default">
+(function(){
+  function zeroMinimumDefault(){
+    const el=document.getElementById("minDiamonds");
+    if(el && (el.textContent.trim()==="" || el.textContent.trim()==="—")) {
+      el.textContent="0";
+    }
+  }
+  if(document.readyState==="loading"){
+    document.addEventListener("DOMContentLoaded",zeroMinimumDefault);
+  }else{
+    zeroMinimumDefault();
+  }
+})();
+</script>
+
+<script id="v31-initial-zero">
+(function(){
+  let userChanged=false;
+
+  function setInitialZero(){
+    if(userChanged) return;
+    const ids=[
+      ["minDiamonds","0"],
+      ["totalSummons","0"],
+      ["overshoot","0"],
+      ["efficiency","0%"]
+    ];
+    ids.forEach(([id,val])=>{
+      const el=document.getElementById(id);
+      if(el) el.textContent=val;
+    });
+  }
+
+  function enableCalculation(){
+    userChanged=true;
+  }
+
+  function init(){
+    const current=document.getElementById("current");
+    const target=document.getElementById("target");
+    if(current) ["input","change"].forEach(e=>current.addEventListener(e,enableCalculation,{once:true}));
+    if(target) ["input","change"].forEach(e=>target.addEventListener(e,enableCalculation,{once:true}));
+    setInitialZero();
+    setTimeout(setInitialZero,50);
+  }
+
+  if(document.readyState==="loading") document.addEventListener("DOMContentLoaded",init);
+  else init();
+})();
+</script>
+
+<script id="v32-reset-zero">
+(function(){
+  const reset=document.getElementById("resetAll");
+  if(!reset) return;
+  // This listener runs after the original reset handler and guarantees the
+  // visible result remains at the requested standard zero state.
+  reset.addEventListener("click",function(){
+    setTimeout(function(){
+      const set=(id,v)=>{
+        const el=document.getElementById(id);
+        if(el) el.textContent=v;
+      };
+      set("shortage","0");
+      set("minDiamonds","0");
+      set("totalSummons","0");
+      set("overshoot","0");
+      set("efficiency","0%");
+      const list=document.getElementById("breakdownList");
+      if(list) list.innerHTML="";
+    },0);
+  });
+})();
+</script>
+
+<style id="v33-mode-result">
+/* Make result values stable and readable for every summon mode. */
+#shortage,#minDiamonds,#totalSummons,#overshoot,#efficiency{
+  visibility:visible!important;
+  opacity:1!important;
+}
+</style>
+<script id="v33-mode-result-script">
+(function(){
+  const current=document.getElementById("current");
+  const target=document.getElementById("target");
+  const shortage=document.getElementById("shortage");
+  const minD=document.getElementById("minDiamonds");
+  const totalS=document.getElementById("totalSummons");
+  const over=document.getElementById("overshoot");
+  const eff=document.getElementById("efficiency");
+  const list=document.getElementById("breakdownList");
+  const modes=[...document.querySelectorAll('input[name="summonMode"]')];
+  if(!current||!target||!shortage||!minD||!totalS||!over||!eff) return;
+
+  const fmt=n=>Number(n).toLocaleString("id-ID");
+  function selectedMode(){
+    const v=document.querySelector('input[name="summonMode"]:checked')?.value || "1";
+    if(v==="33") return {qty:33,cost:1500,name:"33x Gacha"};
+    if(v==="11") return {qty:11,cost:500,name:"11x Gacha"};
+    return {qty:1,cost:50,name:"1x Gacha"};
+  }
+
+  function calculateMode(){
+    const c=Math.max(0,Math.floor(Number(current.value)||0));
+    const t=Math.max(0,Math.floor(Number(target.value)||0));
+    const need=Math.max(0,t-c);
+    const m=selectedMode();
+
+    const count=need===0?0:Math.ceil(need/m.qty);
+    const got=count*m.qty;
+    const cost=count*m.cost;
+
+    shortage.textContent=fmt(need);
+    minD.textContent=fmt(cost);
+    totalS.textContent=fmt(got);
+    over.textContent=fmt(Math.max(0,got-need));
+    eff.textContent=got ? (cost/got).toFixed(2) : "0";
+
+    if(list){
+      if(count===0) list.innerHTML="";
+      else list.innerHTML=
+        '<div class="breakdown-row">'+
+        '<div class="name">'+m.name+'</div>'+
+        '<div class="qty">'+fmt(count)+' kali ('+fmt(got)+' summon)</div>'+
+        '<div class="cost">'+fmt(cost)+' 💎</div>'+
+        '</div>';
+    }
+
+    modes.forEach(x=>x.closest("label")?.classList.toggle("selected",x.checked));
+
+    // Keep the dynamic result-card color in sync.
+    const card=document.querySelector('main.container > section.card.result-card');
+    if(card){
+      card.classList.remove("result-safe","result-high");
+      if(t>0 && need/t<0.5) card.classList.add("result-safe");
+      else card.classList.add("result-high");
+    }
+  }
+
+  // Changing summon mode starts a fresh result state.
+  // The user can then change Progress/Target to perform the calculation.
+  modes.forEach(m=>m.addEventListener("change",function(){
+    window.setGachaResultZero();
+    modes.forEach(x=>x.closest("label")?.classList.toggle("selected",x.checked));
+  }));
+  current.addEventListener("input",calculateMode);
+  target.addEventListener("change",calculateMode);
+
+  // Expose a stable function for reset/other UI layers.
+  window.calculateModeV33=calculateMode;
+
+  // Don't overwrite the requested zero state if the page was explicitly reset.
+  window.setGachaResultZero=function(){
+    shortage.textContent="0";
+    minD.textContent="0";
+    totalS.textContent="0";
+    over.textContent="0";
+    eff.textContent="0%";
+    if(list) list.innerHTML="";
+  };
+
+  // Initial display remains the standard zero state; the user's first edit
+  // (including choosing 11x/33x) triggers the real calculation.
+  window.setGachaResultZero();
+})();
+</script>
+
+<script id="v33-reset-final">
+(function(){
+  const r=document.getElementById("resetAll");
+  if(!r||!window.setGachaResultZero) return;
+  r.addEventListener("click",function(){
+    setTimeout(function(){
+      window.setGachaResultZero();
+    },10);
+  });
+})();
+</script>
+
+<script id="v34-mode-zero-final">
+(function(){
+  function zeroResults(){
+    const ids=[
+      ["shortage","0"],
+      ["minDiamonds","0"],
+      ["totalSummons","0"],
+      ["overshoot","0"],
+      ["efficiency","0%"]
+    ];
+    ids.forEach(([id,value])=>{
+      const el=document.getElementById(id);
+      if(el) el.textContent=value;
+    });
+    const list=document.getElementById("breakdownList");
+    if(list) list.innerHTML="";
+  }
+
+  function bind(){
+    document.querySelectorAll('input[name="summonMode"]').forEach(mode=>{
+      mode.addEventListener("change",function(){
+        // Delay ensures this runs after any older change handlers.
+        setTimeout(zeroResults,0);
+      });
+    });
+  }
+
+  if(document.readyState==="loading")
+    document.addEventListener("DOMContentLoaded",bind);
+  else
+    bind();
+})();
+</script>
+
+<style id="v35-zero-mode">
+#minDiamonds,#totalSummons,#overshoot,#shortage,#efficiency{
+  transition:none!important;
+}
+</style>
+<script id="v35-zero-mode-script">
+(function(){
+  function zero(){
+    const vals={
+      minDiamonds:"0",
+      totalSummons:"0",
+      overshoot:"0",
+      shortage:"0",
+      efficiency:"0%"
+    };
+    Object.keys(vals).forEach(id=>{
+      const el=document.getElementById(id);
+      if(el) el.textContent=vals[id];
+    });
+    const list=document.getElementById("breakdownList");
+    if(list) list.innerHTML="";
+  }
+
+  function bind(){
+    document.querySelectorAll('input[name="summonMode"]').forEach(mode=>{
+      mode.addEventListener("change",function(){
+        zero();
+        // Re-apply after every legacy listener has completed too.
+        setTimeout(zero,0);
+        setTimeout(zero,20);
+      },true);
+    });
+  }
+
+  if(document.readyState==="loading"){
+    document.addEventListener("DOMContentLoaded",bind);
+  }else{
+    bind();
+  }
+})();
+</script>
+
+<style id="v36-purchase-section">
+/* ===== V36: dedicated purchase breakdown ===== */
+main.container > section.card.purchase-card{
+  background:linear-gradient(145deg,#111722 0%,#0b1018 55%,#070b11 100%)!important;
+  border-color:#303b4b!important;
+}
+main.container > section.card.purchase-card h2{
+  color:#dce3ed!important;
+}
+main.container > section.card.purchase-card .breakdown{
+  margin-top:0!important;
+}
+main.container > section.card.purchase-card .breakdown h3{
+  display:none!important;
+}
+main.container > section.card.purchase-card .breakdown-list{
+  min-height:62px!important;
+}
+main.container > section.card.purchase-card .breakdown-row{
+  display:grid!important;
+  grid-template-columns:minmax(0,1fr) auto auto!important;
+  gap:12px!important;
+  align-items:center!important;
+  min-height:62px!important;
+}
+main.container > section.card.purchase-card .breakdown-row .name{
+  font-weight:800!important;
+}
+main.container > section.card.purchase-card .breakdown-row .qty{
+  color:#c9d1dc!important;
+}
+main.container > section.card.purchase-card .breakdown-row .cost{
+  color:#ffc52b!important;
+  font-weight:800!important;
+}
+@media (orientation:portrait){
+  main.container > section.card.purchase-card .breakdown-row{
+    grid-template-columns:1fr!important;
+    gap:5px!important;
+  }
+}
+</style>
+
+<script id="v36-purchase-mode">
+(function(){
+  function getMode(){
+    const v=document.querySelector('input[name="summonMode"]:checked')?.value || "1";
+    if(v==="33") return {qty:33,cost:1500,name:"33x Gacha"};
+    if(v==="11") return {qty:11,cost:500,name:"11x Gacha"};
+    return {qty:1,cost:50,name:"1x Gacha"};
+  }
+
+  function updatePurchaseZero(){
+    const list=document.getElementById("breakdownList");
+    if(!list) return;
+    const m=getMode();
+    list.innerHTML =
+      '<div class="breakdown-row">'+
+        '<div class="name">'+m.name+'</div>'+
+        '<div class="qty">0 kali (0 summon)</div>'+
+        '<div class="cost">0 💎</div>'+
+      '</div>';
+  }
+
+  function bind(){
+    document.querySelectorAll('input[name="summonMode"]').forEach(el=>{
+      el.addEventListener("change",function(){
+        // Mode changes reset the result area to zero, while section 4
+        // immediately identifies the newly selected package.
+        updatePurchaseZero();
+        setTimeout(updatePurchaseZero,0);
+        setTimeout(updatePurchaseZero,20);
+      },true);
+    });
+    updatePurchaseZero();
+  }
+
+  if(document.readyState==="loading") document.addEventListener("DOMContentLoaded",bind);
+  else bind();
+})();
+</script>
+
+<style id="v36-layout">
+@media (orientation:landscape) and (min-width:701px){
+  main.container > section.card{
+    width:100%!important;
+    float:none!important;
+    clear:none!important;
+    margin:0 0 12px!important;
+  }
+  main.container > section.card.result-card,
+  main.container > section.card.purchase-card{
+    width:100%!important;
+  }
+}
+</style>
+
+<style id="v37-section4-orange">
+/* ===== V37: Section 4 orange gradient ===== */
+main.container > section.card.purchase-card{
+  background:linear-gradient(
+    145deg,
+    #4a2410 0%,
+    #2e160b 48%,
+    #160b07 100%
+  )!important;
+  border-color:#9a4b1d!important;
+  box-shadow:
+    inset 0 1px rgba(255,180,90,.10),
+    0 8px 24px rgba(0,0,0,.24)!important;
+}
+main.container > section.card.purchase-card h2{
+  color:#ff9a3d!important;
+  text-shadow:0 0 8px rgba(255,130,40,.18)!important;
+}
+main.container > section.card.purchase-card .breakdown-row{
+  background:linear-gradient(
+    135deg,
+    rgba(92,43,17,.75),
+    rgba(31,14,7,.94)
+  )!important;
+  border-color:#7e3d19!important;
+}
+main.container > section.card.purchase-card .breakdown-row .name{
+  color:#ffd0a0!important;
+}
+main.container > section.card.purchase-card .breakdown-row .qty{
+  color:#f0c39b!important;
+}
+main.container > section.card.purchase-card .breakdown-row .cost{
+  color:#ffb34f!important;
+}
+</style>
+
+<script id="v38-current-zero">
+(function(){
+  function forceCurrentZero(){
+    const el=document.getElementById("current");
+    if(el) el.value="0";
+  }
+
+  function bind(){
+    forceCurrentZero();
+
+    const reset=document.getElementById("resetAll");
+    if(reset){
+      reset.addEventListener("click",function(){
+        setTimeout(forceCurrentZero,0);
+        setTimeout(forceCurrentZero,20);
+      },true);
+    }
+  }
+
+  if(document.readyState==="loading")
+    document.addEventListener("DOMContentLoaded",bind);
+  else
+    bind();
+})();
+</script>
+
+<script id="v39-live-progress">
+(function(){
+  let busy=false;
+
+  function calculateImmediately(){
+    if(busy) return;
+    busy=true;
+    try{
+      const current=document.getElementById("current");
+      if(!current) return;
+      // Fire the calculator's existing input handler immediately.
+      current.dispatchEvent(new Event("input",{bubbles:true}));
+    }finally{
+      busy=false;
+    }
+  }
+
+  function bind(){
+    const current=document.getElementById("current");
+    if(!current) return;
+
+    // Existing calculator already listens to input; this listener guarantees
+    // the result is refreshed as soon as the field receives a value.
+    current.addEventListener("keyup",calculateImmediately,false);
+    current.addEventListener("change",calculateImmediately,false);
+  }
+
+  if(document.readyState==="loading")
+    document.addEventListener("DOMContentLoaded",bind);
+  else
+    bind();
+})();
+</script>
+
+<script id="v40-target-lv2">
+(function(){
+  function setLv2(){
+    const target=document.getElementById("target");
+    if(!target) return;
+    const opt=[...target.options].find(o=>/^Lv\.\s*2\b/i.test(o.textContent.trim()));
+    if(opt) target.value=opt.value;
+  }
+
+  function bind(){
+    setLv2();
+    const reset=document.getElementById("resetAll");
+    if(reset){
+      reset.addEventListener("click",function(){
+        setTimeout(setLv2,0);
+        setTimeout(setLv2,20);
+        setTimeout(setLv2,60);
+      },true);
+    }
+  }
+
+  if(document.readyState==="loading")
+    document.addEventListener("DOMContentLoaded",bind);
+  else
+    bind();
+})();
+</script>
+
+<script id="v41-live-calculation">
+(function(){
+  function mode(){
+    const v=document.querySelector('input[name="summonMode"]:checked')?.value || "1";
+    if(v==="33") return {qty:33,cost:1500,name:"33x Gacha"};
+    if(v==="11") return {qty:11,cost:500,name:"11x Gacha"};
+    return {qty:1,cost:50,name:"1x Gacha"};
+  }
+
+  function calculateNow(){
+    const current=document.getElementById("current");
+    const target=document.getElementById("target");
+    if(!current || !target) return;
+
+    const c=Math.max(0,parseInt(current.value,10)||0);
+    const t=Math.max(0,parseInt(target.value,10)||0);
+    const need=Math.max(0,t-c);
+    const m=mode();
+
+    // If both fields are valid, show the result immediately.
+    const count=need>0 ? Math.ceil(need/m.qty) : 0;
+    const got=count*m.qty;
+    const cost=count*m.cost;
+
+    const set=(id,val)=>{
+      const el=document.getElementById(id);
+      if(el) el.textContent=val;
+    };
+    const fmt=n=>Number(n).toLocaleString("id-ID");
+
+    set("shortage",fmt(need));
+    set("minDiamonds",fmt(cost));
+    set("totalSummons",fmt(got));
+    set("overshoot",fmt(Math.max(0,got-need)));
+    set("efficiency",got ? (cost/got).toFixed(2) : "0%");
+
+    const list=document.getElementById("breakdownList");
+    if(list){
+      if(count===0){
+        list.innerHTML='<div class="breakdown-row"><div class="name">'+m.name+
+          '</div><div class="qty">0 kali (0 summon)</div><div class="cost">0 💎</div></div>';
+      }else{
+        list.innerHTML='<div class="breakdown-row"><div class="name">'+m.name+
+          '</div><div class="qty">'+fmt(count)+' kali ('+fmt(got)+
+          ' summon)</div><div class="cost">'+fmt(cost)+' 💎</div></div>';
+      }
+    }
+
+    const card=document.querySelector('main.container > section.card.result-card');
+    if(card){
+      card.classList.remove("result-safe","result-high");
+      card.classList.add(t>0 && need/t<0.5 ? "result-safe" : "result-high");
+    }
+  }
+
+  function bind(){
+    const current=document.getElementById("current");
+    const target=document.getElementById("target");
+    if(current){
+      current.addEventListener("input",calculateNow);
+      current.addEventListener("change",calculateNow);
+      current.addEventListener("keyup",calculateNow);
+    }
+    if(target){
+      target.addEventListener("change",calculateNow);
+      target.addEventListener("input",calculateNow);
+    }
+    document.querySelectorAll('input[name="summonMode"]').forEach(el=>{
+      el.addEventListener("change",calculateNow);
+    });
+
+    // Calculate once after the default Lv.2 and Progress 0 are established.
+    setTimeout(calculateNow,50);
+  }
+
+  if(document.readyState==="loading")
+    document.addEventListener("DOMContentLoaded",bind);
+  else
+    bind();
+})();
+</script>
+
+<script id="v42-mode-live-calculation">
+(function(){
+  function getMode(){
+    const value=document.querySelector('input[name="summonMode"]:checked')?.value || "1";
+    if(value==="33") return {qty:33,cost:1500,name:"33x Gacha"};
+    if(value==="11") return {qty:11,cost:500,name:"11x Gacha"};
+    return {qty:1,cost:50,name:"1x Gacha"};
+  }
+
+  function recalculateForMode(){
+    const current=document.getElementById("current");
+    const target=document.getElementById("target");
+    if(!current || !target) return;
+
+    const progress=Math.max(0,parseInt(current.value,10)||0);
+    const pity=Math.max(0,parseInt(target.value,10)||0);
+    const need=Math.max(0,pity-progress);
+    const m=getMode();
+
+    const packageCount=need>0 ? Math.ceil(need/m.qty) : 0;
+    const totalSummon=packageCount*m.qty;
+    const diamonds=packageCount*m.cost;
+    const excess=Math.max(0,totalSummon-need);
+
+    const set=(id,value)=>{
+      const el=document.getElementById(id);
+      if(el) el.textContent=value;
+    };
+    const fmt=n=>Number(n).toLocaleString("id-ID");
+
+    set("shortage",fmt(need));
+    set("minDiamonds",fmt(diamonds));
+    set("totalSummons",fmt(totalSummon));
+    set("overshoot",fmt(excess));
+    set("efficiency",totalSummon ? (diamonds/totalSummon).toFixed(2) : "0%");
+
+    const list=document.getElementById("breakdownList");
+    if(list){
+      list.innerHTML=
+        '<div class="breakdown-row">'+
+        '<div class="name">'+m.name+'</div>'+
+        '<div class="qty">'+fmt(packageCount)+' kali ('+fmt(totalSummon)+' summon)</div>'+
+        '<div class="cost">'+fmt(diamonds)+' 💎</div>'+
+        '</div>';
+    }
+
+    const card=document.querySelector('main.container > section.card.result-card');
+    if(card){
+      card.classList.remove("result-safe","result-high");
+      card.classList.add(pity>0 && need/pity<0.5 ? "result-safe" : "result-high");
+    }
+  }
+
+  function bind(){
+    document.querySelectorAll('input[name="summonMode"]').forEach(mode=>{
+      // Capture + bubble-safe delayed execution ensures this runs after
+      // earlier calculator listeners too.
+      mode.addEventListener("change",function(){
+        recalculateForMode();
+        setTimeout(recalculateForMode,0);
+        setTimeout(recalculateForMode,30);
+      },true);
+    });
+    recalculateForMode();
+  }
+
+  if(document.readyState==="loading")
+    document.addEventListener("DOMContentLoaded",bind);
+  else
+    bind();
+})();
+</script>
+</body>
+</html>
+
+<style>
+</style>
+
+<style>
+.byline{
+  display:flex!important;
+  justify-content:center!important;
+  align-items:center!important;
+  gap:12px!important;
+}
+.byline .item-icon{
+  width:58px!important;
+  height:58px!important;
+  object-fit:contain!important;
+  border:0!important;
+  border-radius:0!important;
+  box-shadow:none!important;
+  background:transparent!important;
+}
+@media(max-width:560px){
+  .byline .item-icon{width:48px!important;height:48px!important}
+}
+</style>
